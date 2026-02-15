@@ -152,6 +152,41 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     );
   }
 
+  // Query previous week's best top set for each primary lift day
+  const prevWeekBests = useLiveQuery(
+    async () => {
+      if (!settings || settings.currentWeek <= 1) return {};
+      const prevWeek = settings.currentWeek - 1;
+      const prevSessions = await db.sessions
+        .where({ blockType: settings.currentBlockType, weekNumber: prevWeek })
+        .toArray();
+      if (prevSessions.length === 0) return {};
+
+      const prevSessionIds = prevSessions.map((s) => s.id);
+      const prevSets = await db.sets.where('sessionId').anyOf(prevSessionIds).toArray();
+
+      const bests: Record<number, { weight: number; reps: number; rpe: number; e1rm: number }> = {};
+      for (const sess of prevSessions) {
+        const topSets = prevSets.filter(
+          (s) => s.sessionId === sess.id &&
+            (s.setType === 'top' || s.setType === 'backoff' || s.setType === 'volume') &&
+            s.actualWeight != null && s.actualReps != null && s.actualRPE != null,
+        );
+        const best = findBestSet(topSets);
+        if (best && best.actualWeight && best.actualReps && best.actualRPE) {
+          bests[sess.dayNumber] = {
+            weight: best.actualWeight,
+            reps: best.actualReps,
+            rpe: best.actualRPE,
+            e1rm: best.e1rm ?? 0,
+          };
+        }
+      }
+      return bests;
+    },
+    [settings?.currentBlockType, settings?.currentWeek],
+  );
+
   function getSetsForDay(dayNumber: DayNumber): WorkoutSet[] {
     if (!sessions || !allSets) return [];
     const session = sessions.find((s) => s.dayNumber === dayNumber);
@@ -164,6 +199,7 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
   return {
     sessions: sessions ?? [],
     allSets: allSets ?? [],
+    prevWeekBests: prevWeekBests ?? {},
     getOrCreateSession,
     updateSet,
     updateNotes,

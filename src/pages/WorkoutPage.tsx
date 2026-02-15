@@ -226,14 +226,28 @@ export function WorkoutPage() {
           </div>
           {(() => {
             const totalTonnage = sets.reduce((sum, s) => sum + (s.tonnage ?? 0), 0);
-            return totalTonnage > 0 ? (
-              <div className="flex items-center justify-between mt-1.5">
-                <span className="text-xs text-slate-600">Total Tonnage</span>
-                <span className="text-xs font-semibold text-slate-400 tabular-nums">
-                  {totalTonnage.toLocaleString()} lbs
-                </span>
-              </div>
-            ) : null;
+            const prevBest = workout.prevWeekBests[activeDay];
+            return (
+              <>
+                {totalTonnage > 0 && (
+                  <div className="flex items-center justify-between mt-1.5">
+                    <span className="text-xs text-slate-600">Total Tonnage</span>
+                    <span className="text-xs font-semibold text-slate-400 tabular-nums">
+                      {totalTonnage.toLocaleString()} lbs
+                    </span>
+                  </div>
+                )}
+                {prevBest && (
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-xs text-slate-600">Last Week Top Set</span>
+                    <span className="text-xs font-semibold text-emerald-500 tabular-nums">
+                      {prevBest.weight}×{prevBest.reps} @{prevBest.rpe}
+                      {prevBest.e1rm > 0 && <span className="text-slate-500 font-normal"> · e1RM {prevBest.e1rm}</span>}
+                    </span>
+                  </div>
+                )}
+              </>
+            );
           })()}
         </div>
       )}
