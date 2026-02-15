@@ -132,6 +132,16 @@ export interface ExercisePR {
   lastDate: string;
 }
 
+export const BLOCK_MAX_WEEKS: Record<BlockType, number> = {
+  'linear-8': 8,
+  'linear-6': 6,
+  'linear-4': 4,
+  'dup-6': 6,
+  'wave-6': 6,
+};
+
+export const BLOCK_TYPES: BlockType[] = ['linear-8', 'linear-6', 'linear-4', 'dup-6', 'wave-6'];
+
 export const BLOCK_LABELS: Record<BlockType, string> = {
   'linear-6': 'Linear 6-Week',
   'linear-8': 'Linear 8-Week',

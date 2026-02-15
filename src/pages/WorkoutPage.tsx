@@ -6,8 +6,8 @@ import { RestTimer } from '@/components/workout/RestTimer';
 import { useSettings } from '@/hooks/useSettings';
 import { useActiveWorkout } from '@/hooks/useActiveWorkout';
 import { useRestTimer } from '@/hooks/useRestTimer';
-import { DAY_CONFIG } from '@/db/types';
-import type { SetType, DayNumber, WorkoutSet } from '@/db/types';
+import { DAY_CONFIG, BLOCK_LABELS, BLOCK_TYPES, BLOCK_MAX_WEEKS } from '@/db/types';
+import type { SetType, DayNumber, WorkoutSet, BlockType } from '@/db/types';
 
 function usePersistedState<T>(key: string, defaultValue: T, parse: (v: string) => T, serialize: (v: T) => string = String as any): [T, (v: T) => void] {
   const [value, setValue] = useState<T>(() => {
@@ -69,7 +69,7 @@ function groupSets(sets: WorkoutSet[]) {
 }
 
 export function WorkoutPage() {
-  const { settings } = useSettings();
+  const { settings, updateSettings } = useSettings();
   const [selectedDate, setSelectedDate] = usePersistedState(
     'workoutDate',
     new Date().toISOString().split('T')[0],
@@ -123,10 +123,42 @@ export function WorkoutPage() {
 
   return (
     <div>
-      <Header
-        title="Workout"
-        subtitle={`Week ${settings.currentWeek} — ${session?.phase ?? '...'}`}
-      />
+      <Header title="Workout" />
+
+      {/* Program & Week selectors */}
+      <div className="flex items-center gap-2 px-4 py-2 bg-slate-900/60 border-b border-slate-800">
+        <select
+          value={settings.currentBlockType}
+          onChange={(e) => {
+            const newBlock = e.target.value as BlockType;
+            const maxWeek = BLOCK_MAX_WEEKS[newBlock];
+            const updates: { currentBlockType: BlockType; currentWeek?: number } = { currentBlockType: newBlock };
+            if (settings.currentWeek > maxWeek) updates.currentWeek = 1;
+            initRef.current.clear();
+            updateSettings(updates);
+          }}
+          className="flex-1 bg-slate-800 text-slate-200 text-sm font-medium px-3 py-1.5 rounded-lg border border-slate-700 focus:outline-none focus:border-blue-500/50"
+        >
+          {BLOCK_TYPES.map((bt) => (
+            <option key={bt} value={bt}>{BLOCK_LABELS[bt]}</option>
+          ))}
+        </select>
+
+        <select
+          value={settings.currentWeek}
+          onChange={(e) => {
+            initRef.current.clear();
+            updateSettings({ currentWeek: Number(e.target.value) });
+          }}
+          className="bg-slate-800 text-slate-200 text-sm font-medium px-3 py-1.5 rounded-lg border border-slate-700 focus:outline-none focus:border-blue-500/50"
+        >
+          {Array.from({ length: BLOCK_MAX_WEEKS[settings.currentBlockType] }, (_, i) => (
+            <option key={i + 1} value={i + 1}>Wk {i + 1}</option>
+          ))}
+        </select>
+
+        <span className="text-xs text-slate-500 font-medium">{session?.phase ?? '...'}</span>
+      </div>
 
       {/* Date picker */}
       <div className="flex items-center justify-center gap-2 py-2 bg-slate-950 border-b border-slate-800">

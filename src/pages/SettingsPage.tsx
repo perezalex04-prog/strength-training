@@ -1,11 +1,9 @@
 import { Header } from '@/components/layout/Header';
 import { Card } from '@/components/shared/Card';
 import { useSettings } from '@/hooks/useSettings';
-import { BLOCK_LABELS, type BlockType, type PrimaryLift } from '@/db/types';
+import { BLOCK_LABELS, BLOCK_TYPES, type BlockType, type PrimaryLift } from '@/db/types';
 import { exportAllData, importAllData } from '@/utils/export';
 import { useRef } from 'react';
-
-const BLOCK_TYPES: BlockType[] = ['linear-8', 'linear-6', 'linear-4', 'dup-6', 'wave-6'];
 const LIFTS: { key: PrimaryLift; label: string; rmKey: string; goalKey: string }[] = [
   { key: 'squat', label: 'Squat', rmKey: 'squat1RM', goalKey: 'squatGoal' },
   { key: 'bench', label: 'Bench', rmKey: 'bench1RM', goalKey: 'benchGoal' },
