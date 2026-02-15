@@ -26,19 +26,24 @@ const LIFT_COLORS: Record<PrimaryLift, string> = {
 /**
  * Group sets by exerciseName and find the best set (highest E1RM) for each exercise.
  */
-function getBestSetPerExercise(sets: WorkoutSet[]) {
-  const byExercise = new Map<string, WorkoutSet[]>();
-  for (const s of sets) {
-    if (!s.actualWeight || !s.actualReps || !s.actualRPE) continue;
-    if (!byExercise.has(s.exerciseName)) byExercise.set(s.exerciseName, []);
-    byExercise.get(s.exerciseName)!.push(s);
+function getBestSetPerExercise(allSets: WorkoutSet[]) {
+  const byExercise = new Map<string, { completed: WorkoutSet[]; allSets: WorkoutSet[] }>();
+  for (const s of allSets) {
+    if (!byExercise.has(s.exerciseName)) byExercise.set(s.exerciseName, { completed: [], allSets: [] });
+    const entry = byExercise.get(s.exerciseName)!;
+    entry.allSets.push(s);
+    if (s.actualWeight && s.actualReps && s.actualRPE) {
+      entry.completed.push(s);
+    }
   }
 
-  const results: { exerciseName: string; setType: string; best: WorkoutSet }[] = [];
-  for (const [name, exSets] of byExercise) {
-    const best = findBestSet(exSets);
+  const results: { exerciseName: string; setType: string; best: WorkoutSet; notes: string }[] = [];
+  for (const [name, { completed, allSets: exAllSets }] of byExercise) {
+    const best = findBestSet(completed);
     if (best) {
-      results.push({ exerciseName: name, setType: best.setType, best });
+      // Notes are stored on the first set of the group
+      const notes = exAllSets.sort((a, b) => a.setNumber - b.setNumber)[0]?.notes ?? '';
+      results.push({ exerciseName: name, setType: best.setType, best, notes });
     }
   }
   return results;
@@ -169,29 +174,33 @@ export function HistoryPage() {
                     {/* Expanded: all lifts with best set */}
                     {isExpanded && bestPerExercise.length > 0 && (
                       <div className="pb-3 pl-2 pr-1 space-y-1.5">
-                        {bestPerExercise.map(({ exerciseName, setType, best }) => (
-                          <div
-                            key={exerciseName}
-                            className="flex items-center justify-between py-1.5 px-2 rounded bg-slate-800/40"
-                          >
-                            <div className="min-w-0 flex-1">
-                              <div className="text-xs font-medium text-slate-300 truncate">
-                                {exerciseName}
-                              </div>
-                              <div className={`text-[10px] font-semibold uppercase ${SET_TYPE_COLORS[setType] ?? 'text-slate-500'}`}>
-                                {setType}
-                              </div>
-                            </div>
-                            <div className="text-right ml-3 flex-shrink-0">
-                              <div className="text-sm tabular-nums font-semibold text-slate-200">
-                                {best.actualWeight} × {best.actualReps} @{best.actualRPE}
-                              </div>
-                              {best.e1rm && (
-                                <div className="text-[10px] tabular-nums text-slate-500">
-                                  E1RM: {best.e1rm}
+                        {bestPerExercise.map(({ exerciseName, setType, best, notes }) => (
+                          <div key={exerciseName}>
+                            <div className="flex items-center justify-between py-1.5 px-2 rounded bg-slate-800/40">
+                              <div className="min-w-0 flex-1">
+                                <div className="text-xs font-medium text-slate-300 truncate">
+                                  {exerciseName}
                                 </div>
-                              )}
+                                <div className={`text-[10px] font-semibold uppercase ${SET_TYPE_COLORS[setType] ?? 'text-slate-500'}`}>
+                                  {setType}
+                                </div>
+                              </div>
+                              <div className="text-right ml-3 flex-shrink-0">
+                                <div className="text-sm tabular-nums font-semibold text-slate-200">
+                                  {best.actualWeight} × {best.actualReps} @{best.actualRPE}
+                                </div>
+                                {best.e1rm && (
+                                  <div className="text-[10px] tabular-nums text-slate-500">
+                                    E1RM: {best.e1rm}
+                                  </div>
+                                )}
+                              </div>
                             </div>
+                            {notes && (
+                              <div className="px-2 py-1 text-[10px] text-yellow-400/70 italic">
+                                {notes}
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import type { WorkoutSet, ExerciseCategory } from '@/db/types';
 import { SetRow } from './SetRow';
 import { ExercisePicker } from './ExercisePicker';
@@ -8,16 +8,23 @@ interface SetGroupProps {
   sets: WorkoutSet[];
   onUpdate: (setId: string, updates: { actualWeight?: number | null; actualReps?: number | null; actualRPE?: number | null }) => void;
   onSwapExercise?: (setIds: string[], exerciseId: string, exerciseName: string) => void;
+  onUpdateNotes?: (setId: string, notes: string) => void;
 }
 
-export function SetGroup({ label, sets, onUpdate, onSwapExercise }: SetGroupProps) {
+export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes }: SetGroupProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
+  const notesRef = useRef<HTMLTextAreaElement>(null);
 
   if (sets.length === 0) return null;
 
   const exerciseName = sets[0].exerciseName;
   const isMultiExercise = new Set(sets.map((s) => s.exerciseName)).size > 1;
-  const isPlaceholder = sets[0].exerciseId === '' && sets[0].setType === 'optional';
+  const isPlaceholder = sets[0].exerciseId === '' && sets[0].setType === 'optional' && sets[0].exerciseName.startsWith('(Optional');
+
+  // Notes are stored on the first set of the group
+  const notesSetId = sets[0].id;
+  const currentNotes = sets[0].notes ?? '';
 
   // Determine category for the picker
   const category: ExerciseCategory | null = sets[0].category ?? null;
@@ -25,6 +32,15 @@ export function SetGroup({ label, sets, onUpdate, onSwapExercise }: SetGroupProp
   const handleSwap = (exerciseId: string, newName: string) => {
     if (onSwapExercise) {
       onSwapExercise(sets.map((s) => s.id), exerciseId, newName);
+    }
+  };
+
+  const handleNotesBlur = () => {
+    if (onUpdateNotes && notesRef.current) {
+      const val = notesRef.current.value.trim();
+      if (val !== currentNotes) {
+        onUpdateNotes(notesSetId, val);
+      }
     }
   };
 
@@ -53,9 +69,23 @@ export function SetGroup({ label, sets, onUpdate, onSwapExercise }: SetGroupProp
     <>
       <div className="space-y-1.5">
         <div className="flex items-center justify-between px-1">
-          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            {label}
-          </h4>
+          <div className="flex items-center gap-2">
+            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              {label}
+            </h4>
+            {/* Notes toggle button */}
+            <button
+              onClick={() => setNotesOpen(!notesOpen)}
+              className={`text-[10px] px-1.5 py-0.5 rounded ${
+                currentNotes
+                  ? 'bg-yellow-500/20 text-yellow-400'
+                  : 'bg-slate-800 text-slate-600'
+              }`}
+              title="Notes"
+            >
+              {currentNotes ? '📝' : '📝'}
+            </button>
+          </div>
           {!isMultiExercise && onSwapExercise && (
             <button
               onClick={() => setPickerOpen(true)}
@@ -69,6 +99,19 @@ export function SetGroup({ label, sets, onUpdate, onSwapExercise }: SetGroupProp
             <span className="text-xs text-slate-400 truncate max-w-[160px]">{exerciseName}</span>
           )}
         </div>
+
+        {/* Collapsible notes area */}
+        {notesOpen && (
+          <textarea
+            ref={notesRef}
+            defaultValue={currentNotes}
+            onBlur={handleNotesBlur}
+            placeholder="Add notes (form cues, felt heavy, etc.)"
+            rows={2}
+            className="w-full px-3 py-2 text-xs bg-slate-800/60 border border-slate-700 rounded-lg text-slate-300 placeholder:text-slate-600 resize-none focus:outline-none focus:border-blue-500/50"
+          />
+        )}
+
         {sets.map((set) => (
           <SetRow
             key={set.id}

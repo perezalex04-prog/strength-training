@@ -204,6 +204,7 @@ export function WorkoutPage() {
             sets={group.sets}
             onUpdate={workout.updateSet}
             onSwapExercise={workout.swapExercise}
+            onUpdateNotes={workout.updateNotes}
           />
         ))}
 

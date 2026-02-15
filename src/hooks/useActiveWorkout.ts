@@ -103,6 +103,10 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     await db.sets.update(setId, { ...updates, ...derived });
   }
 
+  async function updateNotes(setId: string, notes: string) {
+    await db.sets.update(setId, { notes });
+  }
+
   async function swapExercise(setIds: string[], exerciseId: string, exerciseName: string) {
     await Promise.all(
       setIds.map((id) => db.sets.update(id, { exerciseId, exerciseName })),
@@ -162,6 +166,7 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     allSets: allSets ?? [],
     getOrCreateSession,
     updateSet,
+    updateNotes,
     swapExercise,
     completeSession,
     getSetsForDay,

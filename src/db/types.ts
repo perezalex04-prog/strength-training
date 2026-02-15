@@ -90,6 +90,8 @@ export interface WorkoutSet {
   tonnage: number | null;
   /** Category hint for ExercisePicker filtering when swapping */
   category?: ExerciseCategory | null;
+  /** User notes for this exercise group */
+  notes?: string;
 }
 
 export interface ProgressionEntry {

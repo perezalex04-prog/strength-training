@@ -157,11 +157,11 @@ export async function generateWorkoutSets(
     }
   }
 
-  // === 3 OPTIONAL SLOTS ===
+  // === 3 OPTIONAL SLOTS (each slot is an independent exercise) ===
   for (let slot = 0; slot < 3; slot++) {
     for (let i = 0; i < template.accessorySets; i++) {
       sets.push(makeSet({
-        exerciseId: '', exerciseName: '(Add Exercise)', setType: 'optional',
+        exerciseId: '', exerciseName: `(Optional ${slot + 1})`, setType: 'optional',
         setNumber: ++setNum, goalWeight: 0,
         goalReps: template.accessoryReps, goalRPE: template.accessoryRPE, category: null,
       }));
