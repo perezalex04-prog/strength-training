@@ -6,6 +6,7 @@ const tabs = [
   { to: '/workout', label: 'Workout', icon: '🏋' },
   { to: '/history', label: 'History', icon: '📈' },
   { to: '/exercises', label: 'Exercises', icon: '📋' },
+  { to: '/calculator', label: 'Calc', icon: '🔢' },
   { to: '/settings', label: 'Settings', icon: '⚙' },
 ];
 

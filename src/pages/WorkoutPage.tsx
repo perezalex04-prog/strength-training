@@ -211,7 +211,7 @@ export function WorkoutPage() {
         ))}
       </div>
 
-      {/* Progress indicator */}
+      {/* Progress indicator + tonnage */}
       {assignedSets.length > 0 && (
         <div className="px-4 pt-3 pb-1">
           <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
@@ -224,6 +224,17 @@ export function WorkoutPage() {
               style={{ width: `${(completedSets / assignedSets.length) * 100}%` }}
             />
           </div>
+          {(() => {
+            const totalTonnage = sets.reduce((sum, s) => sum + (s.tonnage ?? 0), 0);
+            return totalTonnage > 0 ? (
+              <div className="flex items-center justify-between mt-1.5">
+                <span className="text-xs text-slate-600">Total Tonnage</span>
+                <span className="text-xs font-semibold text-slate-400 tabular-nums">
+                  {totalTonnage.toLocaleString()} lbs
+                </span>
+              </div>
+            ) : null;
+          })()}
         </div>
       )}
 

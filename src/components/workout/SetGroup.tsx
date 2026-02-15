@@ -1,5 +1,7 @@
 import { useState, useRef } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
 import type { WorkoutSet, ExerciseCategory } from '@/db/types';
+import { db } from '@/db/database';
 import { SetRow } from './SetRow';
 import { ExercisePicker } from './ExercisePicker';
 
@@ -28,6 +30,13 @@ export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes 
 
   // Determine category for the picker
   const category: ExerciseCategory | null = sets[0].category ?? null;
+
+  // Fetch last performance for this exercise
+  const exerciseId = sets[0].exerciseId;
+  const pr = useLiveQuery(
+    () => (exerciseId ? db.exercisePRs.get(exerciseId) : undefined),
+    [exerciseId],
+  );
 
   const handleSwap = (exerciseId: string, newName: string) => {
     if (onSwapExercise) {
@@ -99,6 +108,16 @@ export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes 
             <span className="text-xs text-slate-400 truncate max-w-[160px]">{exerciseName}</span>
           )}
         </div>
+
+        {/* Last performance */}
+        {pr && pr.lastWeight > 0 && (
+          <div className="px-1 -mt-0.5">
+            <span className="text-[10px] text-slate-600">
+              Last: {pr.lastWeight}×{pr.lastReps} @{pr.lastRPE}
+              {pr.bestE1RM > 0 && ` · PR e1RM: ${pr.bestE1RM}`}
+            </span>
+          </div>
+        )}
 
         {/* Collapsible notes area */}
         {notesOpen && (
