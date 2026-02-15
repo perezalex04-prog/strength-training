@@ -1,0 +1,1522 @@
+[
+  {
+    "id": "ex-001",
+    "name": "Competition Back Squat",
+    "category": "squat-primary"
+  },
+  {
+    "id": "ex-002",
+    "name": "RDL (Light DL)",
+    "category": "squat-secondary"
+  },
+  {
+    "id": "ex-003",
+    "name": "Competition Bench",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-004",
+    "name": "Close Grip Bench",
+    "category": "bench-secondary"
+  },
+  {
+    "id": "ex-005",
+    "name": "Competition Deadlift",
+    "category": "deadlift-primary"
+  },
+  {
+    "id": "ex-006",
+    "name": "Front Squat (Light SQ)",
+    "category": "deadlift-secondary"
+  },
+  {
+    "id": "ex-007",
+    "name": "Barbell Row",
+    "category": "horizontal-row"
+  },
+  {
+    "id": "ex-008",
+    "name": "Leg Press",
+    "category": "quad-accessory"
+  },
+  {
+    "id": "ex-009",
+    "name": "Good Morning",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-010",
+    "name": "Dips (Weighted)",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-011",
+    "name": "Barbell Curl",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-012",
+    "name": "Weighted Pull-up",
+    "category": "vertical-pull"
+  },
+  {
+    "id": "ex-013",
+    "name": "Ab Wheel",
+    "category": "core"
+  },
+  {
+    "id": "ex-014",
+    "name": "Overhead Press",
+    "category": "shoulders-press"
+  },
+  {
+    "id": "ex-015",
+    "name": "Face Pull",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-016",
+    "name": "DB Fly",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-017",
+    "name": "Standing Calf Raise",
+    "category": "calves-misc"
+  },
+  {
+    "id": "ex-018",
+    "name": "Box Jump",
+    "category": "explosive"
+  },
+  {
+    "id": "ex-019",
+    "name": "Low Bar Squat",
+    "category": "squat-primary"
+  },
+  {
+    "id": "ex-020",
+    "name": "Stiff Leg DL (Light DL)",
+    "category": "squat-secondary"
+  },
+  {
+    "id": "ex-021",
+    "name": "Touch and Go Bench",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-022",
+    "name": "Spoto Press",
+    "category": "bench-secondary"
+  },
+  {
+    "id": "ex-023",
+    "name": "Conventional Deadlift",
+    "category": "deadlift-primary"
+  },
+  {
+    "id": "ex-024",
+    "name": "SSB Squat (Light SQ)",
+    "category": "deadlift-secondary"
+  },
+  {
+    "id": "ex-025",
+    "name": "Pendlay Row",
+    "category": "horizontal-row"
+  },
+  {
+    "id": "ex-026",
+    "name": "Leg Press (narrow)",
+    "category": "quad-accessory"
+  },
+  {
+    "id": "ex-027",
+    "name": "Seated Good Morning",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-028",
+    "name": "Dips (Bodyweight)",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-029",
+    "name": "EZ Bar Curl",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-030",
+    "name": "Pull-up",
+    "category": "vertical-pull"
+  },
+  {
+    "id": "ex-031",
+    "name": "Kneeling Ab Wheel",
+    "category": "core"
+  },
+  {
+    "id": "ex-032",
+    "name": "Push Press",
+    "category": "shoulders-press"
+  },
+  {
+    "id": "ex-033",
+    "name": "Banded Face Pull",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-034",
+    "name": "DB Fly (incline)",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-035",
+    "name": "Seated Calf Raise",
+    "category": "calves-misc"
+  },
+  {
+    "id": "ex-036",
+    "name": "Seated Box Jump",
+    "category": "explosive"
+  },
+  {
+    "id": "ex-037",
+    "name": "High Bar Squat",
+    "category": "squat-primary"
+  },
+  {
+    "id": "ex-038",
+    "name": "Good Morning (Light DL)",
+    "category": "squat-secondary"
+  },
+  {
+    "id": "ex-039",
+    "name": "Pause Bench (2s)",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-040",
+    "name": "Larsen Press",
+    "category": "bench-secondary"
+  },
+  {
+    "id": "ex-041",
+    "name": "Sumo Deadlift",
+    "category": "deadlift-primary"
+  },
+  {
+    "id": "ex-042",
+    "name": "Box Squat (Light SQ)",
+    "category": "deadlift-secondary"
+  },
+  {
+    "id": "ex-043",
+    "name": "DB Row",
+    "category": "horizontal-row"
+  },
+  {
+    "id": "ex-044",
+    "name": "Leg Press (wide)",
+    "category": "quad-accessory"
+  },
+  {
+    "id": "ex-045",
+    "name": "Banded Good Morning",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-046",
+    "name": "Close Grip Bench",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-047",
+    "name": "DB Curl",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-048",
+    "name": "Chin-up",
+    "category": "vertical-pull"
+  },
+  {
+    "id": "ex-049",
+    "name": "Standing Ab Wheel",
+    "category": "core"
+  },
+  {
+    "id": "ex-050",
+    "name": "DB Shoulder Press",
+    "category": "shoulders-press"
+  },
+  {
+    "id": "ex-051",
+    "name": "Cable Face Pull",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-052",
+    "name": "DB Fly (decline)",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-053",
+    "name": "Leg Press Calf Raise",
+    "category": "calves-misc"
+  },
+  {
+    "id": "ex-054",
+    "name": "Depth Jump",
+    "category": "explosive"
+  },
+  {
+    "id": "ex-055",
+    "name": "Pause Squat (2s)",
+    "category": "squat-primary"
+  },
+  {
+    "id": "ex-056",
+    "name": "Trap Bar DL (Light DL)",
+    "category": "squat-secondary"
+  },
+  {
+    "id": "ex-057",
+    "name": "Pause Bench (3s)",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-058",
+    "name": "Floor Press",
+    "category": "bench-secondary"
+  },
+  {
+    "id": "ex-059",
+    "name": "Pause Deadlift (floor)",
+    "category": "deadlift-primary"
+  },
+  {
+    "id": "ex-060",
+    "name": "Belt Squat (Light SQ)",
+    "category": "deadlift-secondary"
+  },
+  {
+    "id": "ex-061",
+    "name": "Kroc Row",
+    "category": "horizontal-row"
+  },
+  {
+    "id": "ex-062",
+    "name": "Hack Squat",
+    "category": "quad-accessory"
+  },
+  {
+    "id": "ex-063",
+    "name": "RDL",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-064",
+    "name": "JM Press",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-065",
+    "name": "DB Curl (seated)",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-066",
+    "name": "Weighted Chin-up",
+    "category": "vertical-pull"
+  },
+  {
+    "id": "ex-067",
+    "name": "Pallof Press",
+    "category": "core"
+  },
+  {
+    "id": "ex-068",
+    "name": "DB Shoulder Press (seated)",
+    "category": "shoulders-press"
+  },
+  {
+    "id": "ex-069",
+    "name": "Lateral Raise",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-070",
+    "name": "Cable Fly (low)",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-071",
+    "name": "Single Leg Calf Raise",
+    "category": "calves-misc"
+  },
+  {
+    "id": "ex-072",
+    "name": "Broad Jump",
+    "category": "explosive"
+  },
+  {
+    "id": "ex-073",
+    "name": "Pause Squat (3s)",
+    "category": "squat-primary"
+  },
+  {
+    "id": "ex-074",
+    "name": "Snatch Grip RDL (Light DL)",
+    "category": "squat-secondary"
+  },
+  {
+    "id": "ex-075",
+    "name": "Tempo Bench (3-1-3)",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-076",
+    "name": "Board Press",
+    "category": "bench-secondary"
+  },
+  {
+    "id": "ex-077",
+    "name": "Pause Deadlift (knee)",
+    "category": "deadlift-primary"
+  },
+  {
+    "id": "ex-078",
+    "name": "Goblet Squat (Light SQ)",
+    "category": "deadlift-secondary"
+  },
+  {
+    "id": "ex-079",
+    "name": "Seal Row",
+    "category": "horizontal-row"
+  },
+  {
+    "id": "ex-080",
+    "name": "Pendulum Squat",
+    "category": "quad-accessory"
+  },
+  {
+    "id": "ex-081",
+    "name": "Single Leg RDL",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-082",
+    "name": "Skull Crushers",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-083",
+    "name": "Hammer Curl",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-084",
+    "name": "Neutral Grip Pull-up",
+    "category": "vertical-pull"
+  },
+  {
+    "id": "ex-085",
+    "name": "Banded Pallof Press",
+    "category": "core"
+  },
+  {
+    "id": "ex-086",
+    "name": "Arnold Press",
+    "category": "shoulders-press"
+  },
+  {
+    "id": "ex-087",
+    "name": "Cable Lateral Raise",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-088",
+    "name": "Cable Fly (mid)",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-089",
+    "name": "Tibialis Raise",
+    "category": "calves-misc"
+  },
+  {
+    "id": "ex-090",
+    "name": "KB Swing",
+    "category": "explosive"
+  },
+  {
+    "id": "ex-091",
+    "name": "Tempo Squat (3-1-3)",
+    "category": "squat-primary"
+  },
+  {
+    "id": "ex-092",
+    "name": "Banded Box Squat",
+    "category": "squat-secondary"
+  },
+  {
+    "id": "ex-093",
+    "name": "Close Grip Bench",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-094",
+    "name": "Tempo Bench",
+    "category": "bench-secondary"
+  },
+  {
+    "id": "ex-095",
+    "name": "Tempo Deadlift",
+    "category": "deadlift-primary"
+  },
+  {
+    "id": "ex-096",
+    "name": "Pause Squat (Light SQ)",
+    "category": "deadlift-secondary"
+  },
+  {
+    "id": "ex-097",
+    "name": "Chest Supported Row",
+    "category": "horizontal-row"
+  },
+  {
+    "id": "ex-098",
+    "name": "Belt Squat",
+    "category": "quad-accessory"
+  },
+  {
+    "id": "ex-099",
+    "name": "DB RDL",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-100",
+    "name": "DB Skull Crushers",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-101",
+    "name": "Preacher Curl",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-102",
+    "name": "Wide Grip Pull-up",
+    "category": "vertical-pull"
+  },
+  {
+    "id": "ex-103",
+    "name": "Dead Bug",
+    "category": "core"
+  },
+  {
+    "id": "ex-104",
+    "name": "Machine Shoulder Press",
+    "category": "shoulders-press"
+  },
+  {
+    "id": "ex-105",
+    "name": "Banded Lateral Raise",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-106",
+    "name": "Cable Fly (high)",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-107",
+    "name": "Barbell Shrugs",
+    "category": "calves-misc"
+  },
+  {
+    "id": "ex-108",
+    "name": "KB Snatch",
+    "category": "explosive"
+  },
+  {
+    "id": "ex-109",
+    "name": "Pin Squat",
+    "category": "squat-primary"
+  },
+  {
+    "id": "ex-110",
+    "name": "Deficit Deadlift",
+    "category": "squat-secondary"
+  },
+  {
+    "id": "ex-111",
+    "name": "Wide Grip Bench",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-112",
+    "name": "Feet Up Bench",
+    "category": "bench-secondary"
+  },
+  {
+    "id": "ex-113",
+    "name": "Deficit Deadlift (1\")",
+    "category": "deadlift-primary"
+  },
+  {
+    "id": "ex-114",
+    "name": "Banded Box Squat",
+    "category": "deadlift-secondary"
+  },
+  {
+    "id": "ex-115",
+    "name": "T-Bar Row",
+    "category": "horizontal-row"
+  },
+  {
+    "id": "ex-116",
+    "name": "Leg Extension",
+    "category": "quad-accessory"
+  },
+  {
+    "id": "ex-117",
+    "name": "Back Extension",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-118",
+    "name": "Tricep Pushdown (rope)",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-119",
+    "name": "Cable Curl",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-120",
+    "name": "Lat Pulldown",
+    "category": "vertical-pull"
+  },
+  {
+    "id": "ex-121",
+    "name": "Bird Dog",
+    "category": "core"
+  },
+  {
+    "id": "ex-122",
+    "name": "Landmine Press",
+    "category": "shoulders-press"
+  },
+  {
+    "id": "ex-123",
+    "name": "DB Lateral Raise",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-124",
+    "name": "Cable Crossover",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-125",
+    "name": "DB Shrugs",
+    "category": "calves-misc"
+  },
+  {
+    "id": "ex-126",
+    "name": "Med Ball Slam",
+    "category": "explosive"
+  },
+  {
+    "id": "ex-127",
+    "name": "Box Squat",
+    "category": "squat-primary"
+  },
+  {
+    "id": "ex-128",
+    "name": "Pause Squat",
+    "category": "squat-secondary"
+  },
+  {
+    "id": "ex-129",
+    "name": "Banded Bench",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-130",
+    "name": "Incline Bench",
+    "category": "bench-secondary"
+  },
+  {
+    "id": "ex-131",
+    "name": "Deficit Deadlift (2\")",
+    "category": "deadlift-primary"
+  },
+  {
+    "id": "ex-132",
+    "name": "Pause Deadlift",
+    "category": "deadlift-secondary"
+  },
+  {
+    "id": "ex-133",
+    "name": "Meadows Row",
+    "category": "horizontal-row"
+  },
+  {
+    "id": "ex-134",
+    "name": "Single Leg Extension",
+    "category": "quad-accessory"
+  },
+  {
+    "id": "ex-135",
+    "name": "45\u00b0 Back Extension",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-136",
+    "name": "Tricep Pushdown (bar)",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-137",
+    "name": "Incline Curl",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-138",
+    "name": "Wide Grip Pulldown",
+    "category": "vertical-pull"
+  },
+  {
+    "id": "ex-139",
+    "name": "Plank",
+    "category": "core"
+  },
+  {
+    "id": "ex-140",
+    "name": "Z Press",
+    "category": "shoulders-press"
+  },
+  {
+    "id": "ex-141",
+    "name": "Machine Lateral Raise",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-142",
+    "name": "Pec Deck",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-143",
+    "name": "Wrist Curl",
+    "category": "calves-misc"
+  },
+  {
+    "id": "ex-144",
+    "name": "Med Ball Throw",
+    "category": "explosive"
+  },
+  {
+    "id": "ex-145",
+    "name": "Banded Squat",
+    "category": "squat-primary"
+  },
+  {
+    "id": "ex-146",
+    "name": "Tempo Squat",
+    "category": "squat-secondary"
+  },
+  {
+    "id": "ex-147",
+    "name": "Chain Bench",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-148",
+    "name": "Incline DB Bench",
+    "category": "bench-secondary"
+  },
+  {
+    "id": "ex-149",
+    "name": "Block Pull (2\")",
+    "category": "deadlift-primary"
+  },
+  {
+    "id": "ex-150",
+    "name": "Deficit Deadlift",
+    "category": "deadlift-secondary"
+  },
+  {
+    "id": "ex-151",
+    "name": "Cable Row",
+    "category": "horizontal-row"
+  },
+  {
+    "id": "ex-152",
+    "name": "Walking Lunge",
+    "category": "quad-accessory"
+  },
+  {
+    "id": "ex-153",
+    "name": "Weighted Back Extension",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-154",
+    "name": "Tricep Pushdown (v-bar)",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-155",
+    "name": "Spider Curl",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-156",
+    "name": "Close Grip Pulldown",
+    "category": "vertical-pull"
+  },
+  {
+    "id": "ex-157",
+    "name": "Side Plank",
+    "category": "core"
+  },
+  {
+    "id": "ex-158",
+    "name": "Viking Press",
+    "category": "shoulders-press"
+  },
+  {
+    "id": "ex-159",
+    "name": "Rear Delt Fly",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-160",
+    "name": "Machine Fly",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-161",
+    "name": "Reverse Wrist Curl",
+    "category": "calves-misc"
+  },
+  {
+    "id": "ex-162",
+    "name": "Jump Squat",
+    "category": "explosive"
+  },
+  {
+    "id": "ex-163",
+    "name": "Chain Squat",
+    "category": "squat-primary"
+  },
+  {
+    "id": "ex-164",
+    "name": "Pin Squat",
+    "category": "squat-secondary"
+  },
+  {
+    "id": "ex-165",
+    "name": "Reverse Band Bench",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-166",
+    "name": "Wide Grip Bench",
+    "category": "bench-secondary"
+  },
+  {
+    "id": "ex-167",
+    "name": "Block Pull (4\")",
+    "category": "deadlift-primary"
+  },
+  {
+    "id": "ex-168",
+    "name": "Block Pull",
+    "category": "deadlift-secondary"
+  },
+  {
+    "id": "ex-169",
+    "name": "Machine Row",
+    "category": "horizontal-row"
+  },
+  {
+    "id": "ex-170",
+    "name": "Zercher Squat",
+    "category": "quad-accessory"
+  },
+  {
+    "id": "ex-171",
+    "name": "Reverse Hyper",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-172",
+    "name": "Band Pushdown",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-173",
+    "name": "Concentration Curl",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-174",
+    "name": "Neutral Grip Pulldown",
+    "category": "vertical-pull"
+  },
+  {
+    "id": "ex-175",
+    "name": "RKC Plank",
+    "category": "core"
+  },
+  {
+    "id": "ex-176",
+    "name": "Behind Neck Press",
+    "category": "shoulders-press"
+  },
+  {
+    "id": "ex-177",
+    "name": "Rear Delt Fly (cable)",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-178",
+    "name": "Incline Machine Press",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-179",
+    "name": "Dead Hang",
+    "category": "calves-misc"
+  },
+  {
+    "id": "ex-180",
+    "name": "Speed Squat",
+    "category": "explosive"
+  },
+  {
+    "id": "ex-181",
+    "name": "Reverse Band Squat",
+    "category": "squat-primary"
+  },
+  {
+    "id": "ex-182",
+    "name": "Box Squat",
+    "category": "squat-secondary"
+  },
+  {
+    "id": "ex-183",
+    "name": "Floor Press",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-184",
+    "name": "Decline Bench",
+    "category": "bench-secondary"
+  },
+  {
+    "id": "ex-185",
+    "name": "Rack Pull (below knee)",
+    "category": "deadlift-primary"
+  },
+  {
+    "id": "ex-186",
+    "name": "Rack Pull",
+    "category": "deadlift-secondary"
+  },
+  {
+    "id": "ex-187",
+    "name": "Banded Row",
+    "category": "horizontal-row"
+  },
+  {
+    "id": "ex-188",
+    "name": "Reverse Lunge",
+    "category": "quad-accessory"
+  },
+  {
+    "id": "ex-189",
+    "name": "Banded Reverse Hyper",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-190",
+    "name": "Overhead Tricep Ext (cable)",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-191",
+    "name": "Reverse Curl",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-192",
+    "name": "Single Arm Pulldown",
+    "category": "vertical-pull"
+  },
+  {
+    "id": "ex-193",
+    "name": "Hanging Leg Raise",
+    "category": "core"
+  },
+  {
+    "id": "ex-194",
+    "name": "Pin Press (OHP)",
+    "category": "shoulders-press"
+  },
+  {
+    "id": "ex-195",
+    "name": "Banded Pull Apart",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-196",
+    "name": "Decline Press",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-197",
+    "name": "Speed Bench",
+    "category": "explosive"
+  },
+  {
+    "id": "ex-198",
+    "name": "SSB Squat",
+    "category": "squat-primary"
+  },
+  {
+    "id": "ex-199",
+    "name": "Front Squat",
+    "category": "squat-secondary"
+  },
+  {
+    "id": "ex-200",
+    "name": "2-Board Press",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-201",
+    "name": "DB Bench Press",
+    "category": "bench-secondary"
+  },
+  {
+    "id": "ex-202",
+    "name": "Rack Pull (above knee)",
+    "category": "deadlift-primary"
+  },
+  {
+    "id": "ex-203",
+    "name": "Snatch Grip DL",
+    "category": "deadlift-secondary"
+  },
+  {
+    "id": "ex-204",
+    "name": "Helms Row",
+    "category": "horizontal-row"
+  },
+  {
+    "id": "ex-205",
+    "name": "Bulgarian Split Squat",
+    "category": "quad-accessory"
+  },
+  {
+    "id": "ex-206",
+    "name": "Hip Thrust",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-207",
+    "name": "Overhead Tricep Ext (DB)",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-208",
+    "name": "Zottman Curl",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-209",
+    "name": "Straight Arm Pulldown",
+    "category": "vertical-pull"
+  },
+  {
+    "id": "ex-210",
+    "name": "Toes to Bar",
+    "category": "core"
+  },
+  {
+    "id": "ex-211",
+    "name": "Banded OHP",
+    "category": "shoulders-press"
+  },
+  {
+    "id": "ex-212",
+    "name": "Reverse Pec Deck",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-213",
+    "name": "Svend Press",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-214",
+    "name": "Speed Deadlift",
+    "category": "explosive"
+  },
+  {
+    "id": "ex-215",
+    "name": "Front Squat",
+    "category": "squat-primary"
+  },
+  {
+    "id": "ex-216",
+    "name": "SSB Squat",
+    "category": "squat-secondary"
+  },
+  {
+    "id": "ex-217",
+    "name": "3-Board Press",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-218",
+    "name": "Machine Chest Press",
+    "category": "bench-secondary"
+  },
+  {
+    "id": "ex-219",
+    "name": "Banded Deadlift",
+    "category": "deadlift-primary"
+  },
+  {
+    "id": "ex-220",
+    "name": "Banded Deadlift",
+    "category": "deadlift-secondary"
+  },
+  {
+    "id": "ex-221",
+    "name": "Yates Row",
+    "category": "horizontal-row"
+  },
+  {
+    "id": "ex-222",
+    "name": "Step Up",
+    "category": "quad-accessory"
+  },
+  {
+    "id": "ex-223",
+    "name": "Barbell Hip Thrust",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-224",
+    "name": "French Press",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-225",
+    "name": "Band Curl",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-226",
+    "name": "Banded Pulldown",
+    "category": "vertical-pull"
+  },
+  {
+    "id": "ex-227",
+    "name": "Hanging Knee Raise",
+    "category": "core"
+  },
+  {
+    "id": "ex-228",
+    "name": "Single Arm Press",
+    "category": "shoulders-press"
+  },
+  {
+    "id": "ex-229",
+    "name": "Prone Y Raise",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-230",
+    "name": "Push-up",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-231",
+    "name": "Hang Clean",
+    "category": "explosive"
+  },
+  {
+    "id": "ex-232",
+    "name": "Zercher Squat",
+    "category": "squat-primary"
+  },
+  {
+    "id": "ex-233",
+    "name": "Belt Squat",
+    "category": "squat-secondary"
+  },
+  {
+    "id": "ex-234",
+    "name": "Spoto Press",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-235",
+    "name": "Banded Bench",
+    "category": "bench-secondary"
+  },
+  {
+    "id": "ex-236",
+    "name": "Chain Deadlift",
+    "category": "deadlift-primary"
+  },
+  {
+    "id": "ex-237",
+    "name": "RDL",
+    "category": "deadlift-secondary"
+  },
+  {
+    "id": "ex-238",
+    "name": "Incline DB Row",
+    "category": "horizontal-row"
+  },
+  {
+    "id": "ex-239",
+    "name": "Goblet Squat",
+    "category": "quad-accessory"
+  },
+  {
+    "id": "ex-240",
+    "name": "Single Leg Hip Thrust",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-241",
+    "name": "Tate Press",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-242",
+    "name": "Drag Curl",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-243",
+    "name": "DB Pullover",
+    "category": "vertical-pull"
+  },
+  {
+    "id": "ex-244",
+    "name": "Cable Crunch",
+    "category": "core"
+  },
+  {
+    "id": "ex-245",
+    "name": "Javelin Press",
+    "category": "shoulders-press"
+  },
+  {
+    "id": "ex-246",
+    "name": "Prone T Raise",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-247",
+    "name": "Weighted Push-up",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-248",
+    "name": "Power Clean",
+    "category": "explosive"
+  },
+  {
+    "id": "ex-249",
+    "name": "Anderson Squat",
+    "category": "squat-primary"
+  },
+  {
+    "id": "ex-250",
+    "name": "Banded Squat",
+    "category": "squat-secondary"
+  },
+  {
+    "id": "ex-251",
+    "name": "Larsen Press",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-252",
+    "name": "Pin Press",
+    "category": "bench-secondary"
+  },
+  {
+    "id": "ex-253",
+    "name": "Reverse Band Deadlift",
+    "category": "deadlift-primary"
+  },
+  {
+    "id": "ex-254",
+    "name": "Stiff Leg Deadlift",
+    "category": "deadlift-secondary"
+  },
+  {
+    "id": "ex-255",
+    "name": "Sissy Squat",
+    "category": "quad-accessory"
+  },
+  {
+    "id": "ex-256",
+    "name": "Banded Hip Thrust",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-257",
+    "name": "Rolling DB Extension",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-258",
+    "name": "Waiter Curl",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-259",
+    "name": "Weighted Crunch",
+    "category": "core"
+  },
+  {
+    "id": "ex-260",
+    "name": "Lu Raise",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-261",
+    "name": "Deficit Push-up",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-262",
+    "name": "Plyo Push-up",
+    "category": "explosive"
+  },
+  {
+    "id": "ex-263",
+    "name": "Goblet Squat",
+    "category": "squat-secondary"
+  },
+  {
+    "id": "ex-264",
+    "name": "Feet Up Bench",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-265",
+    "name": "Long Pause Bench",
+    "category": "bench-secondary"
+  },
+  {
+    "id": "ex-266",
+    "name": "Snatch Grip Deadlift",
+    "category": "deadlift-primary"
+  },
+  {
+    "id": "ex-267",
+    "name": "Good Morning",
+    "category": "deadlift-secondary"
+  },
+  {
+    "id": "ex-268",
+    "name": "Spanish Squat",
+    "category": "quad-accessory"
+  },
+  {
+    "id": "ex-269",
+    "name": "GHR",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-270",
+    "name": "Tricep Kickback",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-271",
+    "name": "21s",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-272",
+    "name": "Decline Sit-up",
+    "category": "core"
+  },
+  {
+    "id": "ex-273",
+    "name": "Front Raise",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-274",
+    "name": "Dips (chest focus)",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-275",
+    "name": "Hatfield Squat",
+    "category": "squat-secondary"
+  },
+  {
+    "id": "ex-276",
+    "name": "Slingshot Bench",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-277",
+    "name": "Trap Bar Deadlift",
+    "category": "deadlift-primary"
+  },
+  {
+    "id": "ex-278",
+    "name": "Nordic Curl",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-279",
+    "name": "Diamond Push-up",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-280",
+    "name": "Cable Hammer Curl",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-281",
+    "name": "Loaded Carry",
+    "category": "core"
+  },
+  {
+    "id": "ex-282",
+    "name": "Upright Row",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-283",
+    "name": "Squeeze Press",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-284",
+    "name": "Dead Bench (Pins)",
+    "category": "bench-primary"
+  },
+  {
+    "id": "ex-285",
+    "name": "Leg Curl (lying)",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-286",
+    "name": "California Press",
+    "category": "triceps"
+  },
+  {
+    "id": "ex-287",
+    "name": "Machine Curl",
+    "category": "biceps"
+  },
+  {
+    "id": "ex-288",
+    "name": "Farmer Walk",
+    "category": "core"
+  },
+  {
+    "id": "ex-289",
+    "name": "YTW",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-290",
+    "name": "Hex Press",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-291",
+    "name": "Leg Curl (seated)",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-292",
+    "name": "Suitcase Carry",
+    "category": "core"
+  },
+  {
+    "id": "ex-293",
+    "name": "External Rotation",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-294",
+    "name": "Leg Curl (banded)",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-295",
+    "name": "Overhead Carry",
+    "category": "core"
+  },
+  {
+    "id": "ex-296",
+    "name": "Cuban Rotation",
+    "category": "shoulders-isolation"
+  },
+  {
+    "id": "ex-297",
+    "name": "Pull Through",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-298",
+    "name": "Front Rack Carry",
+    "category": "core"
+  },
+  {
+    "id": "ex-299",
+    "name": "Cable Pull Through",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-300",
+    "name": "Dragon Flag",
+    "category": "core"
+  },
+  {
+    "id": "ex-301",
+    "name": "Glute Bridge",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-302",
+    "name": "L-Sit",
+    "category": "core"
+  },
+  {
+    "id": "ex-303",
+    "name": "Kettlebell Swing",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-304",
+    "name": "Dimel Deadlift",
+    "category": "posterior-chain"
+  }
+]
