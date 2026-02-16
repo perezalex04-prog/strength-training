@@ -111,7 +111,7 @@ export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes,
         </div>
 
         {/* Last performance */}
-        {pr && pr.lastWeight > 0 && (
+        {pr && pr.lastWeight > 0 && !prevWeekBest && (
           <div className="px-1 -mt-0.5">
             <span className="text-[10px] text-slate-600">
               Last: {pr.lastWeight}×{pr.lastReps} @{pr.lastRPE}

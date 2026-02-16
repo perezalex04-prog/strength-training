@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { clsx } from 'clsx';
 import { Header } from '@/components/layout/Header';
 import { SetGroup } from '@/components/workout/SetGroup';
+import { ProgramPreview } from '@/components/workout/ProgramPreview';
 import { RestTimer } from '@/components/workout/RestTimer';
 import { useSettings } from '@/hooks/useSettings';
 import { useActiveWorkout } from '@/hooks/useActiveWorkout';
@@ -84,6 +85,7 @@ export function WorkoutPage() {
     (v) => Number(v) as DayNumber,
     (v) => String(v),
   );
+  const [previewOpen, setPreviewOpen] = useState(false);
   const dateRef = useRef<HTMLInputElement>(null);
   const initRef = useRef<Set<number>>(new Set());
 
@@ -158,6 +160,13 @@ export function WorkoutPage() {
         </select>
 
         <span className="text-xs text-slate-500 font-medium">{session?.phase ?? '...'}</span>
+        <button
+          onClick={() => setPreviewOpen(true)}
+          className="text-slate-500 text-sm px-1.5 py-1 rounded bg-slate-800 active:bg-slate-700"
+          title="Preview program"
+        >
+          👁
+        </button>
       </div>
 
       {/* Date picker */}
@@ -274,6 +283,20 @@ export function WorkoutPage() {
           </div>
         )}
       </div>
+
+      <ProgramPreview
+        isOpen={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        currentBlockType={settings.currentBlockType}
+        currentWeek={settings.currentWeek}
+        onSwitchProgram={(blockType) => {
+          const maxWeek = BLOCK_MAX_WEEKS[blockType];
+          const updates: { currentBlockType: BlockType; currentWeek?: number } = { currentBlockType: blockType };
+          if (settings.currentWeek > maxWeek) updates.currentWeek = 1;
+          initRef.current.clear();
+          updateSettings(updates);
+        }}
+      />
 
       <RestTimer
         isRunning={timer.isRunning}

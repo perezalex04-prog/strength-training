@@ -1,7 +1,7 @@
 import { Header } from '@/components/layout/Header';
 import { Card } from '@/components/shared/Card';
 import { useSettings } from '@/hooks/useSettings';
-import { BLOCK_LABELS, BLOCK_TYPES, type BlockType, type PrimaryLift } from '@/db/types';
+import type { PrimaryLift } from '@/db/types';
 import { exportAllData, importAllData } from '@/utils/export';
 import { useRef } from 'react';
 const LIFTS: { key: PrimaryLift; label: string; rmKey: string; goalKey: string }[] = [
@@ -79,35 +79,6 @@ export function SettingsPage() {
                 <span className="text-xs text-slate-600">lbs</span>
               </div>
             ))}
-          </div>
-        </Card>
-
-        {/* Block Selection */}
-        <Card title="Training Block">
-          <div className="space-y-3">
-            <div>
-              <label className="text-xs text-slate-500 block mb-1">Block Type</label>
-              <select
-                value={settings.currentBlockType}
-                onChange={(e) => updateSettings({ currentBlockType: e.target.value as BlockType })}
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200"
-              >
-                {BLOCK_TYPES.map((bt) => (
-                  <option key={bt} value={bt}>{BLOCK_LABELS[bt]}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="text-xs text-slate-500 block mb-1">Current Week</label>
-              <input
-                type="number"
-                min={1}
-                max={8}
-                value={settings.currentWeek}
-                onChange={(e) => handleNumberChange('currentWeek', e.target.value)}
-                className="w-24 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 tabular-nums"
-              />
-            </div>
           </div>
         </Card>
 
