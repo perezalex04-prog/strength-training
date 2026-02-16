@@ -11,9 +11,10 @@ interface SetGroupProps {
   onUpdate: (setId: string, updates: { actualWeight?: number | null; actualReps?: number | null; actualRPE?: number | null }) => void;
   onSwapExercise?: (setIds: string[], exerciseId: string, exerciseName: string) => void;
   onUpdateNotes?: (setId: string, notes: string) => void;
+  prevWeekBest?: { weight: number; reps: number; rpe: number; e1rm: number };
 }
 
-export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes }: SetGroupProps) {
+export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes, prevWeekBest }: SetGroupProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const notesRef = useRef<HTMLTextAreaElement>(null);
@@ -115,6 +116,16 @@ export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes 
             <span className="text-[10px] text-slate-600">
               Last: {pr.lastWeight}×{pr.lastReps} @{pr.lastRPE}
               {pr.bestE1RM > 0 && ` · PR e1RM: ${pr.bestE1RM}`}
+            </span>
+          </div>
+        )}
+
+        {/* Previous week's top set (only on top sets group) */}
+        {prevWeekBest && (
+          <div className="px-1 -mt-0.5">
+            <span className="text-[10px] text-emerald-500 font-semibold">
+              Last Wk: {prevWeekBest.weight}×{prevWeekBest.reps} @{prevWeekBest.rpe}
+              {prevWeekBest.e1rm > 0 && <span className="text-slate-500 font-normal"> · e1RM {prevWeekBest.e1rm}</span>}
             </span>
           </div>
         )}
