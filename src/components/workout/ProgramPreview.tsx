@@ -27,7 +27,7 @@ export function ProgramPreview({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-end justify-center">
-      <div className="bg-slate-900 w-full max-h-[90vh] rounded-t-2xl flex flex-col safe-bottom">
+      <div className="bg-slate-900 w-full max-h-[95vh] rounded-t-2xl flex flex-col safe-bottom">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800">
           <h3 className="text-sm font-bold text-slate-200">Program Preview</h3>
@@ -59,11 +59,11 @@ export function ProgramPreview({
         </div>
 
         {/* Table */}
-        <div className="flex-1 overflow-y-auto px-4 py-3">
+        <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3" style={{ WebkitOverflowScrolling: 'touch' }}>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="text-slate-500 border-b border-slate-800">
+                <tr className="text-slate-500 border-b border-slate-800 sticky top-0 bg-slate-900 z-10">
                   <th className="text-left py-2 pr-2 font-medium">Wk</th>
                   <th className="text-left py-2 pr-2 font-medium">Phase</th>
                   <th className="text-center py-2 pr-2 font-medium">Top</th>
