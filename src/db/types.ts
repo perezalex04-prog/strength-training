@@ -1,4 +1,4 @@
-export type BlockType = 'linear-6' | 'linear-8' | 'linear-4' | 'dup-6' | 'wave-6';
+export type BlockType = 'linear-6' | 'linear-8' | 'linear-4' | 'dup-6' | 'wave-6' | 'conj-4';
 
 export type Phase = 'accumulation' | 'transmutation' | 'realization' | 'deload';
 
@@ -138,9 +138,10 @@ export const BLOCK_MAX_WEEKS: Record<BlockType, number> = {
   'linear-4': 4,
   'dup-6': 6,
   'wave-6': 6,
+  'conj-4': 4,
 };
 
-export const BLOCK_TYPES: BlockType[] = ['linear-8', 'linear-6', 'linear-4', 'dup-6', 'wave-6'];
+export const BLOCK_TYPES: BlockType[] = ['linear-8', 'linear-6', 'linear-4', 'dup-6', 'wave-6', 'conj-4'];
 
 export const BLOCK_LABELS: Record<BlockType, string> = {
   'linear-6': 'Linear 6-Week',
@@ -148,6 +149,7 @@ export const BLOCK_LABELS: Record<BlockType, string> = {
   'linear-4': 'Linear 4-Week',
   'dup-6': 'DUP 6-Week',
   'wave-6': 'Wave 6-Week',
+  'conj-4': 'Conjugate 4-Week',
 };
 
 export const PHASE_LABELS: Record<Phase, string> = {

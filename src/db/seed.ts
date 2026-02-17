@@ -34,5 +34,14 @@ export async function seedDatabase() {
   const templateCount = await db.templates.count();
   if (templateCount === 0) {
     await db.templates.bulkAdd(templateData as any);
+  } else {
+    // Migrate: add new block types for existing users
+    const hasConj = await db.templates.where({ blockType: 'conj-4', weekNumber: 1 }).count();
+    if (hasConj === 0) {
+      const conjTemplates = (templateData as any[]).filter((t) => t.blockType === 'conj-4');
+      if (conjTemplates.length > 0) {
+        await db.templates.bulkAdd(conjTemplates);
+      }
+    }
   }
 }

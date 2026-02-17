@@ -30,7 +30,7 @@ const DAY_EXERCISE_DEFAULTS: Record<DayNumber, { secondaries: SlotDef[]; accesso
       { name: 'Deficit Deadlift (1")', category: 'deadlift-secondary' },
     ],
     accessories: [
-      { name: 'Zercher Squat', category: 'quad-accessory' },
+      { name: 'Leg Press', category: 'quad-accessory' },
       { name: 'Nordic Curl', category: 'posterior-chain' },
       { name: 'Ab Wheel', category: 'core' },
     ],
@@ -51,9 +51,9 @@ const DAY_EXERCISE_DEFAULTS: Record<DayNumber, { secondaries: SlotDef[]; accesso
       { name: 'Banded Box Squat', category: 'squat-secondary' },
     ],
     accessories: [
-      { name: 'Barbell Row', category: 'horizontal-row' },
-      { name: 'Nordic Curl', category: 'posterior-chain' },
       { name: 'Reverse Hyper', category: 'posterior-chain' },
+      { name: 'Leg Press', category: 'quad-accessory' },
+      { name: 'GHR', category: 'posterior-chain' },
     ],
   },
   5: {
