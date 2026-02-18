@@ -89,7 +89,7 @@ export function ExercisesPage() {
             onClick={() => setSelectedCategory(null)}
             className={clsx(
               'px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap',
-              !selectedCategory ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400',
+              !selectedCategory ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-400',
             )}
           >
             All
@@ -100,7 +100,7 @@ export function ExercisesPage() {
               onClick={() => setSelectedCategory(cat === selectedCategory ? null : cat)}
               className={clsx(
                 'px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap',
-                selectedCategory === cat ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400',
+                selectedCategory === cat ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-400',
               )}
             >
               {CATEGORY_LABELS[cat]}
@@ -126,7 +126,7 @@ export function ExercisesPage() {
                     <div className="text-xs text-slate-400 tabular-nums">
                       Best: {pr.bestWeight} × {pr.bestReps}
                     </div>
-                    <div className="text-xs text-blue-400 tabular-nums">
+                    <div className="text-xs text-amber-400 tabular-nums">
                       E1RM: {pr.bestE1RM}
                     </div>
                   </div>
@@ -140,7 +140,7 @@ export function ExercisesPage() {
       {/* Add Exercise FAB */}
       <button
         onClick={() => setShowAddModal(true)}
-        className="fixed bottom-20 right-4 z-40 w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg text-2xl active:bg-blue-700"
+        className="fixed bottom-20 right-4 z-40 w-14 h-14 rounded-full bg-amber-600 text-white flex items-center justify-center shadow-lg text-2xl active:bg-amber-700"
       >
         +
       </button>
@@ -149,7 +149,7 @@ export function ExercisesPage() {
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-end bg-black/60" onClick={() => setShowAddModal(false)}>
           <div
-            className="w-full bg-slate-900 border-t border-slate-700 rounded-t-2xl safe-bottom p-4 space-y-4"
+            className="w-full bg-slate-900 border-t border-slate-700 rounded-t-xl safe-bottom p-4 space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-semibold text-slate-200">Add Exercise</h3>
@@ -192,7 +192,7 @@ export function ExercisesPage() {
                 className={clsx(
                   'flex-1 py-3 rounded-lg text-sm font-semibold',
                   newName.trim()
-                    ? 'bg-blue-600 text-white active:bg-blue-700'
+                    ? 'bg-amber-600 text-white active:bg-amber-700'
                     : 'bg-slate-700 text-slate-500',
                 )}
               >

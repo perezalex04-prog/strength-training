@@ -3,9 +3,9 @@ import { clsx } from 'clsx';
 type BadgeVariant = 'success' | 'warning' | 'info' | 'muted';
 
 const variantStyles: Record<BadgeVariant, string> = {
-  success: 'bg-green-500/20 text-green-400 border-green-500/30',
+  success: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
   warning: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  info: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+  info: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
   muted: 'bg-slate-700/50 text-slate-400 border-slate-600/30',
 };
 

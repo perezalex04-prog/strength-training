@@ -14,7 +14,7 @@ export function DeltaBar({ label, current, goal }: DeltaBarProps) {
     <div className="space-y-1">
       <div className="flex justify-between text-xs">
         <span className="text-slate-400">{label}</span>
-        <span className={clsx('tabular-nums font-semibold', isGoalReached ? 'text-green-400' : 'text-slate-300')}>
+        <span className={clsx('tabular-nums font-semibold', isGoalReached ? 'text-amber-400' : 'text-slate-300')}>
           {current} / {goal}
         </span>
       </div>
@@ -22,7 +22,7 @@ export function DeltaBar({ label, current, goal }: DeltaBarProps) {
         <div
           className={clsx(
             'h-full rounded-full transition-all duration-500',
-            isGoalReached ? 'bg-green-500' : 'bg-blue-500',
+            isGoalReached ? 'bg-amber-500' : 'bg-amber-600',
           )}
           style={{ width: `${pct}%` }}
         />

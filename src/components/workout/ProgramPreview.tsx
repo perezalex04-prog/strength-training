@@ -50,7 +50,7 @@ export function ProgramPreview({
               onClick={() => setPreviewBlock(bt)}
               className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 previewBlock === bt
-                  ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
                   : 'bg-slate-800 text-slate-500 border border-slate-700'
               }`}
             >
@@ -80,17 +80,17 @@ export function ProgramPreview({
                 <tr
                   key={w.id}
                   className={`border-b border-slate-800/50 ${
-                    isActive ? 'bg-blue-500/10' : ''
+                    isActive ? 'bg-amber-500/10' : ''
                   }`}
                 >
                   <td className="py-2.5 pr-2">
-                    <span className={`font-bold ${isActive ? 'text-blue-400' : 'text-slate-300'}`}>
+                    <span className={`font-bold ${isActive ? 'text-amber-400' : 'text-slate-300'}`}>
                       {w.weekNumber}
                       {isActive && <span className="text-[8px] ml-0.5">◀</span>}
                     </span>
                   </td>
                   <td className="py-2.5 pr-2">
-                    <span className={`capitalize ${isActive ? 'text-blue-300' : 'text-slate-400'}`}>
+                    <span className={`capitalize ${isActive ? 'text-amber-300' : 'text-slate-400'}`}>
                       {w.phase}
                     </span>
                   </td>
@@ -138,7 +138,7 @@ export function ProgramPreview({
               onSwitchProgram(previewBlock);
               onClose();
             }}
-            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-xl text-sm active:bg-blue-700"
+            className="w-full py-3 bg-amber-600 text-white font-bold rounded-lg text-sm uppercase tracking-wide active:bg-amber-700"
           >
             Switch to {BLOCK_LABELS[previewBlock]}
           </button>

@@ -113,8 +113,8 @@ export function CalculatorPage() {
             </div>
 
             {/* Result */}
-            <div className="bg-slate-800/60 rounded-xl p-4 text-center">
-              <div className="text-3xl font-bold text-blue-400 tabular-nums">{rpeWeight} lbs</div>
+            <div className="bg-slate-800/60 rounded-lg p-4 text-center">
+              <div className="text-3xl font-bold text-amber-400 tabular-nums">{rpeWeight} lbs</div>
               <div className="text-xs text-slate-500 mt-1">
                 {rpeReps} reps @ RPE {rpeTarget}
               </div>
@@ -126,7 +126,7 @@ export function CalculatorPage() {
             {/* Use as warmup working weight */}
             <button
               onClick={() => setWorkingWeight(rpeWeight)}
-              className="w-full py-2 bg-slate-800 rounded-lg text-xs text-blue-400 active:bg-slate-700"
+              className="w-full py-2 bg-slate-800 rounded-lg text-xs text-amber-400 active:bg-slate-700"
             >
               Use {rpeWeight} lbs as warmup working weight ↓
             </button>
@@ -177,11 +177,11 @@ export function CalculatorPage() {
                 })}
                 {/* Working sets row */}
                 <div className="grid grid-cols-4 gap-2 items-center pt-1 border-t border-slate-700">
-                  <span className="text-sm font-semibold text-blue-400">Work</span>
-                  <span className="text-right text-sm tabular-nums font-bold text-blue-400">
+                  <span className="text-sm font-semibold text-amber-400">Work</span>
+                  <span className="text-right text-sm tabular-nums font-bold text-amber-400">
                     {workingWeight}
                   </span>
-                  <span className="text-center text-sm text-blue-400">→</span>
+                  <span className="text-center text-sm text-amber-400">→</span>
                   <span className="text-right text-xs text-slate-400 truncate">
                     {formatPlates(calculatePlates(workingWeight, barWeight, availPlates))}
                   </span>

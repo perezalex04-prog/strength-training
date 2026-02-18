@@ -33,9 +33,9 @@ export function MaxesCard({ settings }: MaxesCardProps) {
                 {LIFT_LABELS[lift]}
               </span>
               <span className="text-right text-sm tabular-nums text-slate-300">{current}</span>
-              <span className="text-right text-sm tabular-nums text-blue-400">{goal}</span>
+              <span className="text-right text-sm tabular-nums text-amber-400">{goal}</span>
               <span className="text-right text-sm tabular-nums text-slate-500">{tm}</span>
-              <span className="text-right text-sm tabular-nums text-green-400">+{delta}</span>
+              <span className="text-right text-sm tabular-nums text-amber-500">+{delta}</span>
               <span className="text-right text-xs tabular-nums text-slate-500">{pct}%</span>
             </div>
           );

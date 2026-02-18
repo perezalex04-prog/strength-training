@@ -139,7 +139,7 @@ export function WorkoutPage() {
             initRef.current.clear();
             updateSettings(updates);
           }}
-          className="flex-1 bg-slate-800 text-slate-200 text-sm font-medium px-3 py-1.5 rounded-lg border border-slate-700 focus:outline-none focus:border-blue-500/50"
+          className="flex-1 bg-slate-800 text-slate-200 text-sm font-medium px-3 py-1.5 rounded border border-slate-700 focus:outline-none focus:border-amber-500/50"
         >
           {BLOCK_TYPES.map((bt) => (
             <option key={bt} value={bt}>{BLOCK_LABELS[bt]}</option>
@@ -152,7 +152,7 @@ export function WorkoutPage() {
             initRef.current.clear();
             updateSettings({ currentWeek: Number(e.target.value) });
           }}
-          className="bg-slate-800 text-slate-200 text-sm font-medium px-3 py-1.5 rounded-lg border border-slate-700 focus:outline-none focus:border-blue-500/50"
+          className="bg-slate-800 text-slate-200 text-sm font-medium px-3 py-1.5 rounded border border-slate-700 focus:outline-none focus:border-amber-500/50"
         >
           {Array.from({ length: BLOCK_MAX_WEEKS[settings.currentBlockType] }, (_, i) => (
             <option key={i + 1} value={i + 1}>Wk {i + 1}</option>
@@ -162,10 +162,10 @@ export function WorkoutPage() {
         <span className="text-xs text-slate-500 font-medium">{session?.phase ?? '...'}</span>
         <button
           onClick={() => setPreviewOpen(true)}
-          className="text-slate-500 text-sm px-1.5 py-1 rounded bg-slate-800 active:bg-slate-700"
+          className="text-slate-500 text-[10px] font-bold tracking-wider uppercase px-2 py-1 rounded bg-slate-800 active:bg-slate-700 border border-slate-700"
           title="Preview program"
         >
-          👁
+          VIEW
         </button>
       </div>
 
@@ -173,7 +173,7 @@ export function WorkoutPage() {
       <div className="flex items-center justify-center gap-2 py-2 bg-slate-950 border-b border-slate-800">
         <button
           onClick={() => dateRef.current?.showPicker?.()}
-          className="text-sm text-blue-400 font-medium px-3 py-1 rounded-lg bg-slate-800 active:bg-slate-700"
+          className="text-sm text-amber-400 font-medium px-3 py-1 rounded bg-slate-800 active:bg-slate-700"
         >
           {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', {
             weekday: 'short', month: 'short', day: 'numeric',
@@ -211,7 +211,7 @@ export function WorkoutPage() {
             className={clsx(
               'flex-shrink-0 px-3 py-3 text-xs font-semibold transition-colors whitespace-nowrap',
               activeDay === day.dayNumber
-                ? 'text-blue-400 border-b-2 border-blue-400'
+                ? 'text-amber-400 border-b-2 border-amber-400'
                 : 'text-slate-500',
             )}
           >
@@ -229,7 +229,7 @@ export function WorkoutPage() {
           </div>
           <div className="h-1 bg-slate-800 rounded-full overflow-hidden">
             <div
-              className="h-full bg-blue-500 rounded-full transition-all duration-300"
+              className="h-full bg-amber-500 rounded-full transition-all duration-300"
               style={{ width: `${(completedSets / assignedSets.length) * 100}%` }}
             />
           </div>
@@ -271,7 +271,7 @@ export function WorkoutPage() {
         {session && !session.completed && hasAnyCompletedSet && (
           <button
             onClick={() => workout.completeSession(session.id)}
-            className="w-full py-4 bg-green-600 text-white font-bold rounded-xl text-lg active:bg-green-700"
+            className="w-full py-4 bg-amber-600 text-white font-bold rounded-lg text-lg uppercase tracking-wide active:bg-amber-700"
           >
             Complete Workout{completedSets < assignedSets.length ? ` (${completedSets}/${assignedSets.length})` : ''}
           </button>
@@ -279,7 +279,7 @@ export function WorkoutPage() {
 
         {session?.completed && (
           <div className="text-center py-4">
-            <span className="text-green-400 font-semibold text-lg">Workout Complete</span>
+            <span className="text-amber-400 font-bold text-lg uppercase tracking-wide">Workout Complete</span>
           </div>
         )}
       </div>

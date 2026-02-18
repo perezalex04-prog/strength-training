@@ -51,9 +51,9 @@ export function BlockProgress({ settings }: BlockProgressProps) {
               key={i}
               className={`flex-1 h-1.5 rounded-full ${
                 i + 1 < settings.currentWeek
-                  ? 'bg-blue-500'
+                  ? 'bg-amber-500'
                   : i + 1 === settings.currentWeek
-                    ? 'bg-blue-400 animate-pulse'
+                    ? 'bg-amber-400 animate-pulse'
                     : 'bg-slate-800'
               }`}
             />

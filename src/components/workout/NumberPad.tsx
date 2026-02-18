@@ -51,7 +51,7 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-black/60" onClick={onClose}>
       <div
-        className="w-full bg-slate-900 border-t border-slate-700 rounded-t-2xl safe-bottom"
+        className="w-full bg-slate-900 border-t border-slate-700 rounded-t-xl safe-bottom"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -73,7 +73,7 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
                 className={clsx(
                   'flex-1 py-2.5 rounded-lg text-sm font-semibold',
                   delta > 0
-                    ? 'bg-blue-500/20 text-blue-400 active:bg-blue-500/30'
+                    ? 'bg-amber-500/20 text-amber-400 active:bg-amber-500/30'
                     : 'bg-red-500/20 text-red-400 active:bg-red-500/30',
                 )}
               >
@@ -123,7 +123,7 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
           </button>
           <button
             onClick={handleConfirm}
-            className="py-4 rounded-lg bg-blue-600 text-white text-xl font-bold active:bg-blue-700"
+            className="py-4 rounded-lg bg-amber-600 text-white text-xl font-bold active:bg-amber-700"
           >
             ✓
           </button>

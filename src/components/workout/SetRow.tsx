@@ -14,7 +14,7 @@ const setTypeColors: Record<SetType, string> = {
   top: 'border-l-red-500',
   backoff: 'border-l-orange-500',
   volume: 'border-l-cyan-500',
-  secondary: 'border-l-blue-500',
+  secondary: 'border-l-amber-500',
   accessory: 'border-l-purple-500',
   optional: 'border-l-slate-600',
 };
@@ -54,7 +54,7 @@ export function SetRow({ set, onUpdate, showExerciseName = false }: SetRowProps)
           {showExerciseName && (
             <div className="text-xs text-slate-500 truncate mb-0.5">{set.exerciseName}</div>
           )}
-          <div className="text-xs text-green-500/70">
+          <div className="text-xs text-slate-500/80">
             {set.goalWeight > 0 && <>{set.goalWeight} × {set.goalReps} @{set.goalRPE}</>}
             {set.goalWeight === 0 && <>{set.goalReps} reps @{set.goalRPE}</>}
           </div>

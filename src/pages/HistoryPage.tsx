@@ -18,8 +18,8 @@ import {
 } from 'recharts';
 
 const LIFT_COLORS: Record<PrimaryLift, string> = {
-  squat: '#3b82f6',
-  bench: '#eab308',
+  squat: '#f59e0b',
+  bench: '#94a3b8',
   deadlift: '#ef4444',
 };
 
@@ -53,7 +53,7 @@ const SET_TYPE_COLORS: Record<string, string> = {
   top: 'text-red-400',
   backoff: 'text-orange-400',
   volume: 'text-cyan-400',
-  secondary: 'text-blue-400',
+  secondary: 'text-amber-400',
   accessory: 'text-purple-400',
   optional: 'text-slate-400',
 };

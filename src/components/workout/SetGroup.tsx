@@ -93,13 +93,13 @@ export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes,
               }`}
               title="Notes"
             >
-              {currentNotes ? '📝' : '📝'}
+              NOTE
             </button>
           </div>
           {!isMultiExercise && onSwapExercise && (
             <button
               onClick={() => setPickerOpen(true)}
-              className="flex items-center gap-1 text-xs text-blue-400 active:text-blue-300 px-1 py-0.5"
+              className="flex items-center gap-1 text-xs text-amber-400 active:text-amber-300 px-1 py-0.5"
             >
               <span className="truncate max-w-[140px]">{exerciseName}</span>
               <span>⇄</span>
@@ -123,7 +123,7 @@ export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes,
         {/* Previous week's top set (only on top sets group) */}
         {prevWeekBest && (
           <div className="px-1 -mt-0.5">
-            <span className="text-[10px] text-emerald-500 font-semibold">
+            <span className="text-[10px] text-amber-500 font-semibold">
               Last Wk: {prevWeekBest.weight}×{prevWeekBest.reps} @{prevWeekBest.rpe}
               {prevWeekBest.e1rm > 0 && <span className="text-slate-500 font-normal"> · e1RM {prevWeekBest.e1rm}</span>}
             </span>
@@ -138,7 +138,7 @@ export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes,
             onBlur={handleNotesBlur}
             placeholder="Add notes (form cues, felt heavy, etc.)"
             rows={2}
-            className="w-full px-3 py-2 text-xs bg-slate-800/60 border border-slate-700 rounded-lg text-slate-300 placeholder:text-slate-600 resize-none focus:outline-none focus:border-blue-500/50"
+            className="w-full px-3 py-2 text-xs bg-slate-800/60 border border-slate-700 rounded text-slate-300 placeholder:text-slate-600 resize-none focus:outline-none focus:border-amber-500/50"
           />
         )}
 

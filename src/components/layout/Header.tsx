@@ -23,7 +23,7 @@ export function Header({ title, subtitle, showBack }: HeaderProps) {
           </button>
         )}
         <div>
-          <h1 className="text-lg font-bold text-slate-100">{title}</h1>
+          <h1 className="text-lg font-black text-slate-100 uppercase tracking-wider">{title}</h1>
           {subtitle && (
             <p className="text-xs text-slate-500">{subtitle}</p>
           )}

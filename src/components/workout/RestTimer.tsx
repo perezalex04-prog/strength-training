@@ -30,7 +30,7 @@ export function RestTimer({ isRunning, formattedTime, secondsLeft, onStart, onSt
         'fixed bottom-20 right-4 z-40 w-16 h-16 rounded-full flex items-center justify-center shadow-lg transition-colors',
         urgency
           ? 'bg-red-600 text-white animate-pulse'
-          : 'bg-blue-600 text-white',
+          : 'bg-amber-600 text-white',
       )}
     >
       <span className="text-lg font-bold tabular-nums">{formattedTime}</span>

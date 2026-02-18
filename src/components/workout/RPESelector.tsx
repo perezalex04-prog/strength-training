@@ -27,7 +27,7 @@ export function RPESelector({ isOpen, onClose, onSelect, currentValue }: RPESele
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-black/60" onClick={onClose}>
       <div
-        className="w-full bg-slate-900 border-t border-slate-700 rounded-t-2xl safe-bottom"
+        className="w-full bg-slate-900 border-t border-slate-700 rounded-t-xl safe-bottom"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-4 pt-4 pb-2">
@@ -40,9 +40,9 @@ export function RPESelector({ isOpen, onClose, onSelect, currentValue }: RPESele
               key={rpe}
               onClick={() => { onSelect(rpe); onClose(); }}
               className={clsx(
-                'flex flex-col items-center py-4 rounded-xl transition-colors',
+                'flex flex-col items-center py-4 rounded-lg transition-colors',
                 currentValue === rpe
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-amber-600 text-white'
                   : 'bg-slate-800 text-slate-200 active:bg-slate-700',
               )}
             >
