@@ -7,7 +7,7 @@ const tabs = [
   { to: '/history', label: 'LOG' },
   { to: '/exercises', label: 'LIFTS' },
   { to: '/calculator', label: 'CALC' },
-  { to: '/settings', label: 'SET' },
+  { to: '/settings', label: '⚙' },
 ];
 
 export function BottomNav() {
