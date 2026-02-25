@@ -110,13 +110,24 @@ export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes,
           )}
         </div>
 
-        {/* Last performance */}
-        {pr && pr.lastWeight > 0 && !prevWeekBest && (
-          <div className="px-1 -mt-0.5">
-            <span className="text-[10px] text-slate-600">
-              Last: {pr.lastWeight}×{pr.lastReps} @{pr.lastRPE}
-              {pr.bestE1RM > 0 && ` · PR e1RM: ${pr.bestE1RM}`}
-            </span>
+        {/* Performance history: Last session + All-time best */}
+        {pr && pr.lastWeight > 0 && (
+          <div className="px-1 -mt-0.5 space-y-0.5">
+            {/* Most recent session */}
+            <div>
+              <span className="text-[10px] text-slate-500">
+                Last: {pr.lastWeight}×{pr.lastReps} @{pr.lastRPE}
+              </span>
+            </div>
+            {/* All-time best (only show if different from last) */}
+            {pr.bestE1RM > 0 && (pr.bestWeight !== pr.lastWeight || pr.bestReps !== pr.lastReps) && (
+              <div>
+                <span className="text-[10px] text-amber-500 font-semibold">
+                  Best: {pr.bestWeight}×{pr.bestReps} @{pr.bestRPE}
+                  <span className="text-slate-500 font-normal"> · e1RM {pr.bestE1RM}</span>
+                </span>
+              </div>
+            )}
           </div>
         )}
 
