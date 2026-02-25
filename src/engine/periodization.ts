@@ -170,7 +170,10 @@ export async function generateWorkoutSets(
     if (template.volumeTopSets) {
       const vTopReps = template.volumeTopReps ?? template.topReps;
       const vTopRPE = template.volumeTopRPE ?? template.topRPE;
-      const vTopWeight = roundTo5(calculateGoalWeight(trainingMax, vTopReps, vTopRPE) * fatigueMult);
+      // Use direct percentage for speed/DE work, otherwise RPE-based calculation
+      const vTopWeight = template.volumeTopPercent
+        ? roundTo5(trainingMax * template.volumeTopPercent * fatigueMult)
+        : roundTo5(calculateGoalWeight(trainingMax, vTopReps, vTopRPE) * fatigueMult);
       for (let i = 0; i < template.volumeTopSets; i++) {
         sets.push(makeSet({
           exerciseId: primary.id, exerciseName: primary.name, setType: 'top',

@@ -58,10 +58,12 @@ export interface PeriodizationTemplate {
   accessorySets: number;
   accessoryReps: number;
   accessoryRPE: number;
-  /** Volume-day overrides (DUP) — if present, volume days use these instead */
+  /** Volume-day overrides (DUP/Conjugate) — if present, volume days use these instead */
   volumeTopSets?: number;
   volumeTopReps?: number;
   volumeTopRPE?: number;
+  /** Direct percentage of training max for speed/DE work (e.g. 0.55 = 55%) */
+  volumeTopPercent?: number;
   volumeBackoffSets?: number;
   volumeBackoffReps?: number;
   volumeBackoffRPE?: number;

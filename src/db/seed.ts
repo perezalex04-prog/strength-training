@@ -88,6 +88,7 @@ export async function seedDatabase() {
         volumeTopSets: tpl.volumeTopSets,
         volumeTopReps: tpl.volumeTopReps,
         volumeTopRPE: tpl.volumeTopRPE,
+        volumeTopPercent: tpl.volumeTopPercent,
         volumeBackoffSets: tpl.volumeBackoffSets,
         volumeBackoffReps: tpl.volumeBackoffReps,
         volumeBackoffRPE: tpl.volumeBackoffRPE,
