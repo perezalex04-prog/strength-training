@@ -157,7 +157,7 @@ export const BLOCK_LABELS: Record<BlockType, string> = {
   'linear-4': 'Linear 4-Week',
   'dup-6': 'DUP 6-Week',
   'wave-6': 'Wave 6-Week',
-  'conj-4': 'Conjugate 4-Week',
+  'conj-4': 'Westside 4-Week',
   'peak-8': 'Meet Peak 8-Week',
 };
 
@@ -189,3 +189,15 @@ export const DAY_CONFIG: DayConfig[] = [
   { dayNumber: 4, label: 'Day 4 — Deadlift', shortLabel: 'D4 Dead',  primaryLift: 'deadlift', isVolume: false },
   { dayNumber: 5, label: 'Day 5 — Upper',    shortLabel: 'D5 Upper', primaryLift: 'bench',    isVolume: true },
 ];
+
+const CONJ_DAY_CONFIG: DayConfig[] = [
+  { dayNumber: 1, label: 'Day 1 — ME Upper', shortLabel: 'ME Upper', primaryLift: 'bench', isVolume: false },
+  { dayNumber: 2, label: 'Day 2 — ME Lower', shortLabel: 'ME Lower', primaryLift: 'squat', isVolume: false },
+  { dayNumber: 3, label: 'Day 3 — DE Upper', shortLabel: 'DE Upper', primaryLift: 'bench', isVolume: true },
+  { dayNumber: 4, label: 'Day 4 — DE Lower', shortLabel: 'DE Lower', primaryLift: 'squat', isVolume: true },
+];
+
+export function getDayConfigForBlock(blockType: BlockType): DayConfig[] {
+  if (blockType === 'conj-4') return CONJ_DAY_CONFIG;
+  return DAY_CONFIG;
+}

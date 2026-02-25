@@ -4,7 +4,7 @@ import { generateWorkoutSets } from '@/engine/periodization';
 import { computeSetDerived, updateExercisePRs, findBestSet, createProgressionSnapshot } from '@/engine/progression';
 import { calculateAutoregulatedBackoff, checkForNewPR } from '@/engine/autoregulation';
 import type { UserSettings, WorkoutSession, WorkoutSet, DayNumber, PrimaryLift } from '@/db/types';
-import { DAY_CONFIG } from '@/db/types';
+import { getDayConfigForBlock } from '@/db/types';
 
 export interface OneRMUpdate {
   lift: string;
@@ -38,7 +38,7 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     if (!settings) throw new Error('Settings not loaded');
 
     const sessionDate = date ?? today;
-    const day = DAY_CONFIG.find((d) => d.dayNumber === dayNumber)!;
+    const day = getDayConfigForBlock(settings.currentBlockType).find((d) => d.dayNumber === dayNumber)!;
 
     // Check IndexedDB DIRECTLY — not the stale React sessions array
     const sessionId = `session-${settings.currentBlockType}-w${settings.currentWeek}-d${dayNumber}-${sessionDate}`;

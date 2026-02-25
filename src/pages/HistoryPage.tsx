@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/db/database';
 import { Header } from '@/components/layout/Header';
 import { Card } from '@/components/shared/Card';
-import { DAY_CONFIG, BLOCK_LABELS, PHASE_LABELS } from '@/db/types';
+import { BLOCK_LABELS, PHASE_LABELS, getDayConfigForBlock } from '@/db/types';
 import type { PrimaryLift, WorkoutSet } from '@/db/types';
 import { findBestSet } from '@/engine/progression';
 import {
@@ -134,7 +134,7 @@ export function HistoryPage() {
               {completedSessions.map((session) => {
                 const sets = sessionSets?.[session.id] ?? [];
                 const bestPerExercise = getBestSetPerExercise(sets);
-                const dayConfig = DAY_CONFIG.find((d) => d.dayNumber === session.dayNumber);
+                const dayConfig = getDayConfigForBlock(session.blockType).find((d) => d.dayNumber === session.dayNumber);
                 const isExpanded = expandedSession === session.id;
                 const blockLabel = BLOCK_LABELS[session.blockType] ?? session.blockType;
                 const phaseLabel = PHASE_LABELS[session.phase] ?? session.phase;

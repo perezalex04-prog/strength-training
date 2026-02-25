@@ -77,6 +77,59 @@ const PRIMARY_EXERCISES: Record<DayNumber, { name: string; category: ExerciseCat
   5: { name: 'Banded Bench', category: 'bench-primary' },
 };
 
+// Westside Conjugate 4-day exercise maps
+const CONJ_PRIMARY_EXERCISES: Partial<Record<DayNumber, { name: string; category: ExerciseCategory }>> = {
+  1: { name: 'Competition Bench', category: 'bench-primary' },       // ME Upper
+  2: { name: 'Competition Back Squat', category: 'squat-primary' },  // ME Lower
+  3: { name: 'Banded Bench', category: 'bench-primary' },            // DE Upper
+  4: { name: 'Banded Box Squat', category: 'squat-secondary' },      // DE Lower
+};
+
+const CONJ_DAY_EXERCISE_DEFAULTS: Partial<Record<DayNumber, { secondaries: SlotDef[]; accessories: SlotDef[] }>> = {
+  1: { // ME Upper
+    secondaries: [
+      { name: 'Incline Bench', category: 'bench-secondary' },
+      { name: 'Barbell Row', category: 'horizontal-row' },
+    ],
+    accessories: [
+      { name: 'Tricep Pushdown (rope)', category: 'triceps' },
+      { name: 'Face Pull', category: 'shoulders-isolation' },
+      { name: 'Spider Curl', category: 'biceps' },
+    ],
+  },
+  2: { // ME Lower
+    secondaries: [
+      { name: 'Deficit Deadlift (1")', category: 'deadlift-secondary' },
+    ],
+    accessories: [
+      { name: 'Reverse Hyper', category: 'posterior-chain' },
+      { name: 'Leg Press', category: 'quad-accessory' },
+      { name: 'GHR', category: 'posterior-chain' },
+    ],
+  },
+  3: { // DE Upper
+    secondaries: [
+      { name: 'Overhead Press', category: 'shoulders-press' },
+      { name: 'Weighted Pull-up', category: 'vertical-pull' },
+    ],
+    accessories: [
+      { name: 'Overhead Tricep Ext (cable)', category: 'triceps' },
+      { name: 'Cable Fly (low)', category: 'chest-accessory' },
+      { name: 'Cable Curl', category: 'biceps' },
+    ],
+  },
+  4: { // DE Lower
+    secondaries: [
+      { name: 'Speed Deadlift', category: 'explosive' },
+    ],
+    accessories: [
+      { name: 'Leg Press', category: 'quad-accessory' },
+      { name: 'Nordic Curl', category: 'posterior-chain' },
+      { name: 'Ab Wheel', category: 'core' },
+    ],
+  },
+};
+
 async function findExercise(name: string, category: ExerciseCategory) {
   const found = await db.exercises.where('name').equals(name).first();
   if (found) return { id: found.id, name: found.name };
@@ -101,9 +154,9 @@ export async function generateWorkoutSets(
   const sets: Omit<WorkoutSet, 'id' | 'sessionId'>[] = [];
   let setNum = 0;
 
-  const primaryDef = PRIMARY_EXERCISES[dayNumber];
+  const primaryDef = (blockType === 'conj-4' ? CONJ_PRIMARY_EXERCISES[dayNumber] : null) ?? PRIMARY_EXERCISES[dayNumber];
   const primary = await findExercise(primaryDef.name, primaryDef.category);
-  const dayDefaults = DAY_EXERCISE_DEFAULTS[dayNumber];
+  const dayDefaults = (blockType === 'conj-4' ? CONJ_DAY_EXERCISE_DEFAULTS[dayNumber] : null) ?? DAY_EXERCISE_DEFAULTS[dayNumber];
 
   // === AUTOREGULATION: Fatigue multiplier from completed sessions this week ===
   const fatigueMult = await calculateFatigueMultiplier(blockType, weekNumber);
@@ -113,7 +166,21 @@ export async function generateWorkoutSets(
 
   // === PRIMARY LIFT ===
   if (isVolume) {
-    // Use volume-day overrides if present (DUP), otherwise fall back to backoff prescription
+    // Top sets for volume days (DE speed work on conjugate, gauge set on DUP)
+    if (template.volumeTopSets) {
+      const vTopReps = template.volumeTopReps ?? template.topReps;
+      const vTopRPE = template.volumeTopRPE ?? template.topRPE;
+      const vTopWeight = roundTo5(calculateGoalWeight(trainingMax, vTopReps, vTopRPE) * fatigueMult);
+      for (let i = 0; i < template.volumeTopSets; i++) {
+        sets.push(makeSet({
+          exerciseId: primary.id, exerciseName: primary.name, setType: 'top',
+          setNumber: ++setNum, goalWeight: vTopWeight,
+          goalReps: vTopReps, goalRPE: vTopRPE, category: primaryDef.category,
+        }));
+      }
+    }
+
+    // Volume/supplemental sets
     const volReps = template.volumeBackoffReps ?? template.backoffReps;
     const volRPE = template.volumeBackoffRPE ?? template.backoffRPE;
     const volSets = template.volumeBackoffSets ?? 4;

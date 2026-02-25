@@ -7,7 +7,7 @@ import { RestTimer } from '@/components/workout/RestTimer';
 import { useSettings } from '@/hooks/useSettings';
 import { useActiveWorkout, type OneRMUpdate } from '@/hooks/useActiveWorkout';
 import { useRestTimer } from '@/hooks/useRestTimer';
-import { DAY_CONFIG, BLOCK_LABELS, BLOCK_TYPES, BLOCK_MAX_WEEKS } from '@/db/types';
+import { BLOCK_LABELS, BLOCK_TYPES, BLOCK_MAX_WEEKS, getDayConfigForBlock } from '@/db/types';
 import type { SetType, DayNumber, WorkoutSet, BlockType } from '@/db/types';
 
 function usePersistedState<T>(key: string, defaultValue: T, parse: (v: string) => T, serialize: (v: T) => string = String as any): [T, (v: T) => void] {
@@ -137,6 +137,9 @@ export function WorkoutPage() {
             const maxWeek = BLOCK_MAX_WEEKS[newBlock];
             const updates: { currentBlockType: BlockType; currentWeek?: number } = { currentBlockType: newBlock };
             if (settings.currentWeek > maxWeek) updates.currentWeek = 1;
+            // Clamp activeDay if new block has fewer days
+            const newDays = getDayConfigForBlock(newBlock);
+            if (activeDay > newDays.length) setActiveDay(1);
             initRef.current.clear();
             updateSettings(updates);
           }}
@@ -203,9 +206,9 @@ export function WorkoutPage() {
         )}
       </div>
 
-      {/* Day tabs — 5 days, scrollable */}
+      {/* Day tabs — block-aware day count */}
       <div className="flex border-b border-slate-800 bg-slate-950 sticky top-[57px] z-30 overflow-x-auto">
-        {DAY_CONFIG.map((day) => (
+        {getDayConfigForBlock(settings.currentBlockType).map((day) => (
           <button
             key={day.dayNumber}
             onClick={() => setActiveDay(day.dayNumber)}
@@ -306,6 +309,8 @@ export function WorkoutPage() {
           const maxWeek = BLOCK_MAX_WEEKS[blockType];
           const updates: { currentBlockType: BlockType; currentWeek?: number } = { currentBlockType: blockType };
           if (settings.currentWeek > maxWeek) updates.currentWeek = 1;
+          const newDays = getDayConfigForBlock(blockType);
+          if (activeDay > newDays.length) setActiveDay(1);
           initRef.current.clear();
           updateSettings(updates);
         }}

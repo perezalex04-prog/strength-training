@@ -67,5 +67,31 @@ export async function seedDatabase() {
         });
       }
     }
+
+    // Migrate: update existing conj-4 templates to Westside prescriptions
+    const conjTemplates = (templateData as any[]).filter((t) => t.blockType === 'conj-4');
+    for (const tpl of conjTemplates) {
+      await db.templates.update(tpl.id, {
+        phase: tpl.phase,
+        topSets: tpl.topSets,
+        topReps: tpl.topReps,
+        topRPE: tpl.topRPE,
+        backoffSets: tpl.backoffSets,
+        backoffReps: tpl.backoffReps,
+        backoffRPE: tpl.backoffRPE,
+        secondarySets: tpl.secondarySets,
+        secondaryReps: tpl.secondaryReps,
+        secondaryRPE: tpl.secondaryRPE,
+        accessorySets: tpl.accessorySets,
+        accessoryReps: tpl.accessoryReps,
+        accessoryRPE: tpl.accessoryRPE,
+        volumeTopSets: tpl.volumeTopSets,
+        volumeTopReps: tpl.volumeTopReps,
+        volumeTopRPE: tpl.volumeTopRPE,
+        volumeBackoffSets: tpl.volumeBackoffSets,
+        volumeBackoffReps: tpl.volumeBackoffReps,
+        volumeBackoffRPE: tpl.volumeBackoffRPE,
+      });
+    }
   }
 }
