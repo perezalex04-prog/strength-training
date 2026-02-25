@@ -7,18 +7,37 @@ interface ExercisePickerProps {
   isOpen: boolean;
   onClose: () => void;
   onSelect: (exerciseId: string, exerciseName: string) => void;
-  /** If provided, filter to this category. If null, show all exercises. */
+  /** If provided, filter to this category's muscle group. If null, show all exercises. */
   category: ExerciseCategory | null;
+}
+
+const MUSCLE_GROUPS: { label: string; categories: ExerciseCategory[] }[] = [
+  { label: 'SQUAT', categories: ['squat-primary', 'squat-secondary'] },
+  { label: 'BENCH & CHEST', categories: ['bench-primary', 'bench-secondary', 'chest-accessory'] },
+  { label: 'DEADLIFT', categories: ['deadlift-primary', 'deadlift-secondary'] },
+  { label: 'BACK', categories: ['horizontal-row', 'vertical-pull'] },
+  { label: 'LEGS', categories: ['quad-accessory', 'posterior-chain'] },
+  { label: 'SHOULDERS', categories: ['shoulders-press', 'shoulders-isolation'] },
+  { label: 'ARMS', categories: ['triceps', 'biceps'] },
+  { label: 'CORE', categories: ['core'] },
+  { label: 'OTHER', categories: ['calves-misc', 'explosive'] },
+];
+
+function getGroupCategories(cat: ExerciseCategory): ExerciseCategory[] {
+  const group = MUSCLE_GROUPS.find((g) => g.categories.includes(cat));
+  return group ? group.categories : [cat];
 }
 
 export function ExercisePicker({ isOpen, onClose, onSelect, category }: ExercisePickerProps) {
   const [search, setSearch] = useState('');
 
+  const targetCategories = category ? getGroupCategories(category) : null;
+
   const exercises = useLiveQuery(
     async () => {
       if (!isOpen) return [];
-      if (category) {
-        return db.exercises.where('category').equals(category).toArray();
+      if (targetCategories) {
+        return db.exercises.where('category').anyOf(targetCategories).toArray();
       }
       return db.exercises.orderBy('name').toArray();
     },
@@ -31,51 +50,74 @@ export function ExercisePicker({ isOpen, onClose, onSelect, category }: Exercise
     (e) => !search || e.name.toLowerCase().includes(search.toLowerCase()),
   );
 
-  return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-slate-950/95" onClick={onClose}>
-      <div
-        className="flex-1 flex flex-col max-h-full"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="px-4 pt-4 pb-2 border-b border-slate-800">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-semibold text-slate-300">
-              {category ? 'Select Exercise' : 'All Exercises'}
-            </span>
-            <button onClick={onClose} className="text-slate-500 text-sm px-2 py-1">
-              Cancel
-            </button>
-          </div>
-          <input
-            type="text"
-            placeholder="Search..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            autoFocus
-            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600"
-          />
-        </div>
+  // Group filtered exercises by muscle group
+  const grouped = MUSCLE_GROUPS.map((group) => ({
+    label: group.label,
+    exercises: filtered.filter((e) => group.categories.includes(e.category)),
+  })).filter((g) => g.exercises.length > 0);
 
-        {/* Exercise list */}
-        <div className="flex-1 overflow-y-auto px-4 py-2 safe-bottom">
-          {filtered.length === 0 && (
-            <div className="text-center py-8 text-slate-600 text-sm">No exercises found</div>
-          )}
-          {filtered.map((exercise) => (
-            <button
-              key={exercise.id}
-              onClick={() => {
-                onSelect(exercise.id, exercise.name);
-                onClose();
-                setSearch('');
-              }}
-              className="w-full text-left px-3 py-3 border-b border-slate-800/50 active:bg-slate-800 transition-colors"
-            >
-              <div className="text-sm text-slate-200">{exercise.name}</div>
-            </button>
-          ))}
+  const handleClose = () => {
+    onClose();
+    setSearch('');
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex flex-col bg-slate-950"
+      style={{
+        paddingTop: 'env(safe-area-inset-top, 0px)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+      }}
+    >
+      {/* Header */}
+      <div className="px-4 pt-4 pb-2 border-b border-slate-800 shrink-0">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm font-bold text-slate-200 uppercase tracking-wider">
+            {category ? 'Swap Exercise' : 'All Exercises'}
+          </span>
+          <button
+            onClick={handleClose}
+            className="text-amber-400 text-sm font-bold px-3 py-1 uppercase tracking-wider"
+          >
+            Close
+          </button>
         </div>
+        <input
+          type="text"
+          placeholder="Search..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          autoFocus
+          className="w-full bg-slate-800 border border-slate-700 rounded px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-amber-500/50"
+        />
+      </div>
+
+      {/* Exercise list */}
+      <div className="flex-1 overflow-y-auto min-h-0 px-4 pb-20 overscroll-contain">
+        {filtered.length === 0 && (
+          <div className="text-center py-8 text-slate-600 text-sm">No exercises found</div>
+        )}
+        {grouped.map((group) => (
+          <div key={group.label}>
+            <div className="sticky top-0 bg-slate-950 pt-3 pb-1 z-10">
+              <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+                {group.label}
+              </span>
+            </div>
+            {group.exercises.map((exercise) => (
+              <button
+                key={exercise.id}
+                onClick={() => {
+                  onSelect(exercise.id, exercise.name);
+                  handleClose();
+                }}
+                className="w-full text-left px-3 py-2.5 border-b border-slate-800/50 active:bg-slate-800 transition-colors"
+              >
+                <div className="text-sm text-slate-200">{exercise.name}</div>
+              </button>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );
