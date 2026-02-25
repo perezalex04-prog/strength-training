@@ -2,8 +2,15 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/db/database';
 import { generateWorkoutSets } from '@/engine/periodization';
 import { computeSetDerived, updateExercisePRs, findBestSet, createProgressionSnapshot } from '@/engine/progression';
+import { calculateAutoregulatedBackoff, checkForNewPR } from '@/engine/autoregulation';
 import type { UserSettings, WorkoutSession, WorkoutSet, DayNumber, PrimaryLift } from '@/db/types';
 import { DAY_CONFIG } from '@/db/types';
+
+export interface OneRMUpdate {
+  lift: string;
+  old: number;
+  new: number;
+}
 
 export function useActiveWorkout(settings: UserSettings | undefined, selectedDate?: string) {
   const today = selectedDate ?? new Date().toISOString().split('T')[0];
@@ -34,7 +41,6 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     const day = DAY_CONFIG.find((d) => d.dayNumber === dayNumber)!;
 
     // Check IndexedDB DIRECTLY — not the stale React sessions array
-    // This prevents the race condition where remounting overwrites existing data
     const sessionId = `session-${settings.currentBlockType}-w${settings.currentWeek}-d${dayNumber}-${sessionDate}`;
     const existingById = await db.sessions.get(sessionId);
     if (existingById) return existingById;
@@ -101,6 +107,42 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
 
     const derived = computeSetDerived(merged, trainingMax);
     await db.sets.update(setId, { ...updates, ...derived });
+
+    // === INTRA-SESSION AUTOREGULATION ===
+    // When a top set is fully logged, recalculate backoff weights in real-time
+    if (
+      set.setType === 'top' &&
+      merged.actualWeight != null &&
+      merged.actualReps != null &&
+      merged.actualRPE != null
+    ) {
+      const sessionSets = await db.sets.where('sessionId').equals(set.sessionId).toArray();
+      const template = await db.templates
+        .where({ blockType: settings.currentBlockType, weekNumber: settings.currentWeek })
+        .first();
+
+      if (template) {
+        const uncompletedBackoffs = sessionSets.filter(
+          (s) => s.setType === 'backoff' && s.actualWeight == null,
+        );
+
+        if (uncompletedBackoffs.length > 0) {
+          const newBackoffWeight = calculateAutoregulatedBackoff(
+            merged.actualWeight,
+            merged.actualReps,
+            merged.actualRPE,
+            template.backoffReps,
+            template.backoffRPE,
+          );
+
+          await Promise.all(
+            uncompletedBackoffs.map((s) =>
+              db.sets.update(s.id, { goalWeight: newBackoffWeight }),
+            ),
+          );
+        }
+      }
+    }
   }
 
   async function updateNotes(setId: string, notes: string) {
@@ -113,10 +155,10 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     );
   }
 
-  async function completeSession(sessionId: string) {
+  async function completeSession(sessionId: string): Promise<OneRMUpdate[]> {
     const sets = await db.sets.where('sessionId').equals(sessionId).toArray();
     const session = await db.sessions.get(sessionId);
-    if (!session || !settings) return;
+    if (!session || !settings) return [];
 
     await updateExercisePRs(sets, session.date);
     await db.sessions.update(sessionId, { completed: true });
@@ -150,6 +192,22 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
       session.phase,
       liftBests,
     );
+
+    // === AUTO 1RM UPDATES ===
+    const rmUpdates: OneRMUpdate[] = [];
+    for (const lift of lifts) {
+      const best = liftBests[lift];
+      if (!best?.actualWeight || !best?.actualReps || !best?.actualRPE) continue;
+
+      const current1RM = settings[`${lift}1RM` as keyof UserSettings] as number;
+      const newRM = checkForNewPR(best.actualWeight, best.actualReps, best.actualRPE, current1RM);
+      if (newRM) {
+        await db.settings.update('user', { [`${lift}1RM`]: newRM });
+        rmUpdates.push({ lift, old: current1RM, new: newRM });
+      }
+    }
+
+    return rmUpdates;
   }
 
   // Query previous week's best top set for each primary lift day

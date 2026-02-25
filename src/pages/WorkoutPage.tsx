@@ -5,7 +5,7 @@ import { SetGroup } from '@/components/workout/SetGroup';
 import { ProgramPreview } from '@/components/workout/ProgramPreview';
 import { RestTimer } from '@/components/workout/RestTimer';
 import { useSettings } from '@/hooks/useSettings';
-import { useActiveWorkout } from '@/hooks/useActiveWorkout';
+import { useActiveWorkout, type OneRMUpdate } from '@/hooks/useActiveWorkout';
 import { useRestTimer } from '@/hooks/useRestTimer';
 import { DAY_CONFIG, BLOCK_LABELS, BLOCK_TYPES, BLOCK_MAX_WEEKS } from '@/db/types';
 import type { SetType, DayNumber, WorkoutSet, BlockType } from '@/db/types';
@@ -86,6 +86,7 @@ export function WorkoutPage() {
     (v) => String(v),
   );
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [rmUpdates, setRmUpdates] = useState<OneRMUpdate[]>([]);
   const dateRef = useRef<HTMLInputElement>(null);
   const initRef = useRef<Set<number>>(new Set());
 
@@ -270,7 +271,10 @@ export function WorkoutPage() {
 
         {session && !session.completed && hasAnyCompletedSet && (
           <button
-            onClick={() => workout.completeSession(session.id)}
+            onClick={async () => {
+              const updates = await workout.completeSession(session.id);
+              if (updates.length > 0) setRmUpdates(updates);
+            }}
             className="w-full py-4 bg-amber-600 text-white font-bold rounded-lg text-lg uppercase tracking-wide active:bg-amber-700"
           >
             Complete Workout{completedSets < assignedSets.length ? ` (${completedSets}/${assignedSets.length})` : ''}
@@ -278,8 +282,17 @@ export function WorkoutPage() {
         )}
 
         {session?.completed && (
-          <div className="text-center py-4">
-            <span className="text-amber-400 font-bold text-lg uppercase tracking-wide">Workout Complete</span>
+          <div className="text-center py-4 space-y-2">
+            <span className="text-amber-400 font-bold text-lg uppercase tracking-wide block">Workout Complete</span>
+            {rmUpdates.length > 0 && (
+              <div className="space-y-1">
+                {rmUpdates.map((u) => (
+                  <div key={u.lift} className="text-sm text-amber-300 font-semibold">
+                    {u.lift.toUpperCase()} 1RM: {u.old} → {u.new} lbs
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -1,4 +1,4 @@
-export type BlockType = 'linear-6' | 'linear-8' | 'linear-4' | 'dup-6' | 'wave-6' | 'conj-4';
+export type BlockType = 'linear-6' | 'linear-8' | 'linear-4' | 'dup-6' | 'wave-6' | 'conj-4' | 'peak-8';
 
 export type Phase = 'accumulation' | 'transmutation' | 'realization' | 'deload';
 
@@ -58,6 +58,13 @@ export interface PeriodizationTemplate {
   accessorySets: number;
   accessoryReps: number;
   accessoryRPE: number;
+  /** Volume-day overrides (DUP) — if present, volume days use these instead */
+  volumeTopSets?: number;
+  volumeTopReps?: number;
+  volumeTopRPE?: number;
+  volumeBackoffSets?: number;
+  volumeBackoffReps?: number;
+  volumeBackoffRPE?: number;
 }
 
 export interface WorkoutSession {
@@ -139,9 +146,10 @@ export const BLOCK_MAX_WEEKS: Record<BlockType, number> = {
   'dup-6': 6,
   'wave-6': 6,
   'conj-4': 4,
+  'peak-8': 8,
 };
 
-export const BLOCK_TYPES: BlockType[] = ['linear-8', 'linear-6', 'linear-4', 'dup-6', 'wave-6', 'conj-4'];
+export const BLOCK_TYPES: BlockType[] = ['linear-8', 'linear-6', 'linear-4', 'dup-6', 'wave-6', 'conj-4', 'peak-8'];
 
 export const BLOCK_LABELS: Record<BlockType, string> = {
   'linear-6': 'Linear 6-Week',
@@ -150,6 +158,7 @@ export const BLOCK_LABELS: Record<BlockType, string> = {
   'dup-6': 'DUP 6-Week',
   'wave-6': 'Wave 6-Week',
   'conj-4': 'Conjugate 4-Week',
+  'peak-8': 'Meet Peak 8-Week',
 };
 
 export const PHASE_LABELS: Record<Phase, string> = {

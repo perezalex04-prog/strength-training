@@ -36,11 +36,35 @@ export async function seedDatabase() {
     await db.templates.bulkAdd(templateData as any);
   } else {
     // Migrate: add new block types for existing users
-    const hasConj = await db.templates.where({ blockType: 'conj-4', weekNumber: 1 }).count();
-    if (hasConj === 0) {
-      const conjTemplates = (templateData as any[]).filter((t) => t.blockType === 'conj-4');
-      if (conjTemplates.length > 0) {
-        await db.templates.bulkAdd(conjTemplates);
+    const newBlockTypes = ['conj-4', 'peak-8'];
+    for (const bt of newBlockTypes) {
+      const count = await db.templates.where({ blockType: bt, weekNumber: 1 }).count();
+      if (count === 0) {
+        const newTemplates = (templateData as any[]).filter((t) => t.blockType === bt);
+        if (newTemplates.length > 0) {
+          await db.templates.bulkAdd(newTemplates);
+        }
+      }
+    }
+
+    // Migrate: update existing DUP templates with volume-day fields
+    const dupTemplates = (templateData as any[]).filter((t) => t.blockType === 'dup-6');
+    for (const tpl of dupTemplates) {
+      if (tpl.volumeBackoffReps) {
+        await db.templates.update(tpl.id, {
+          phase: tpl.phase,
+          topReps: tpl.topReps,
+          topRPE: tpl.topRPE,
+          backoffSets: tpl.backoffSets,
+          backoffReps: tpl.backoffReps,
+          backoffRPE: tpl.backoffRPE,
+          volumeTopSets: tpl.volumeTopSets,
+          volumeTopReps: tpl.volumeTopReps,
+          volumeTopRPE: tpl.volumeTopRPE,
+          volumeBackoffSets: tpl.volumeBackoffSets,
+          volumeBackoffReps: tpl.volumeBackoffReps,
+          volumeBackoffRPE: tpl.volumeBackoffRPE,
+        });
       }
     }
   }

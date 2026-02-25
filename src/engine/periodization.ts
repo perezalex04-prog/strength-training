@@ -6,7 +6,8 @@ import type {
   WorkoutSet,
   ExerciseCategory,
 } from '@/db/types';
-import { calculateGoalWeight } from './e1rm';
+import { calculateGoalWeight, roundTo5 } from './e1rm';
+import { getLastWeight, calculateFatigueMultiplier, calculateVolumeAdjustment } from './autoregulation';
 
 interface SlotDef {
   name: string;
@@ -104,18 +105,28 @@ export async function generateWorkoutSets(
   const primary = await findExercise(primaryDef.name, primaryDef.category);
   const dayDefaults = DAY_EXERCISE_DEFAULTS[dayNumber];
 
+  // === AUTOREGULATION: Fatigue multiplier from completed sessions this week ===
+  const fatigueMult = await calculateFatigueMultiplier(blockType, weekNumber);
+
+  // === AUTOREGULATION: Volume adjustment from previous week's RPE performance ===
+  const volumeAdj = await calculateVolumeAdjustment(blockType, weekNumber);
+
   // === PRIMARY LIFT ===
   if (isVolume) {
-    const volWeight = calculateGoalWeight(trainingMax, template.backoffReps, template.backoffRPE);
-    for (let i = 0; i < 4; i++) {
+    // Use volume-day overrides if present (DUP), otherwise fall back to backoff prescription
+    const volReps = template.volumeBackoffReps ?? template.backoffReps;
+    const volRPE = template.volumeBackoffRPE ?? template.backoffRPE;
+    const volSets = template.volumeBackoffSets ?? 4;
+    const volWeight = roundTo5(calculateGoalWeight(trainingMax, volReps, volRPE) * fatigueMult);
+    for (let i = 0; i < volSets; i++) {
       sets.push(makeSet({
         exerciseId: primary.id, exerciseName: primary.name, setType: 'volume',
         setNumber: ++setNum, goalWeight: volWeight,
-        goalReps: template.backoffReps, goalRPE: template.backoffRPE, category: primaryDef.category,
+        goalReps: volReps, goalRPE: volRPE, category: primaryDef.category,
       }));
     }
   } else {
-    const topGoalWeight = calculateGoalWeight(trainingMax, template.topReps, template.topRPE);
+    const topGoalWeight = roundTo5(calculateGoalWeight(trainingMax, template.topReps, template.topRPE) * fatigueMult);
     for (let i = 0; i < template.topSets; i++) {
       sets.push(makeSet({
         exerciseId: primary.id, exerciseName: primary.name, setType: 'top',
@@ -123,8 +134,13 @@ export async function generateWorkoutSets(
         goalReps: template.topReps, goalRPE: template.topRPE, category: primaryDef.category,
       }));
     }
-    const backoffGoalWeight = Math.round(topGoalWeight * 0.9 / 5) * 5;
-    for (let i = 0; i < template.backoffSets; i++) {
+
+    // Backoff: RPE-based calculation instead of flat 90%
+    const backoffGoalWeight = roundTo5(calculateGoalWeight(trainingMax, template.backoffReps, template.backoffRPE) * fatigueMult);
+
+    // Volume-adjusted backoff set count (clamped to at least 1)
+    const adjustedBackoffSets = Math.max(1, template.backoffSets + volumeAdj);
+    for (let i = 0; i < adjustedBackoffSets; i++) {
       sets.push(makeSet({
         exerciseId: primary.id, exerciseName: primary.name, setType: 'backoff',
         setNumber: ++setNum, goalWeight: backoffGoalWeight,
@@ -133,25 +149,27 @@ export async function generateWorkoutSets(
     }
   }
 
-  // === SECONDARIES ===
+  // === SECONDARIES (auto-weight from PR history) ===
   for (const sec of dayDefaults.secondaries) {
     const exercise = await findExercise(sec.name, sec.category);
+    const lastWeight = await getLastWeight(exercise.id);
     for (let i = 0; i < template.secondarySets; i++) {
       sets.push(makeSet({
         exerciseId: exercise.id, exerciseName: exercise.name, setType: 'secondary',
-        setNumber: ++setNum, goalWeight: 0,
+        setNumber: ++setNum, goalWeight: lastWeight,
         goalReps: template.secondaryReps, goalRPE: template.secondaryRPE, category: sec.category,
       }));
     }
   }
 
-  // === ACCESSORIES ===
+  // === ACCESSORIES (auto-weight from PR history) ===
   for (const acc of dayDefaults.accessories) {
     const exercise = await findExercise(acc.name, acc.category);
+    const lastWeight = await getLastWeight(exercise.id);
     for (let i = 0; i < template.accessorySets; i++) {
       sets.push(makeSet({
         exerciseId: exercise.id, exerciseName: exercise.name, setType: 'accessory',
-        setNumber: ++setNum, goalWeight: 0,
+        setNumber: ++setNum, goalWeight: lastWeight,
         goalReps: template.accessoryReps, goalRPE: template.accessoryRPE, category: acc.category,
       }));
     }
