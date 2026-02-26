@@ -86,45 +86,45 @@ const CONJ_PRIMARY_EXERCISES: Partial<Record<DayNumber, { name: string; category
 };
 
 const CONJ_DAY_EXERCISE_DEFAULTS: Partial<Record<DayNumber, { secondaries: SlotDef[]; accessories: SlotDef[] }>> = {
-  1: { // ME Upper
+  1: { // ME Upper — heavy supplemental bench + rows, tricep-heavy accessories
     secondaries: [
-      { name: 'Incline Bench', category: 'bench-secondary' },
+      { name: 'Close Grip Bench', category: 'bench-secondary' },
       { name: 'Barbell Row', category: 'horizontal-row' },
     ],
     accessories: [
-      { name: 'Tricep Pushdown (rope)', category: 'triceps' },
+      { name: 'JM Press', category: 'triceps' },
       { name: 'Face Pull', category: 'shoulders-isolation' },
       { name: 'Spider Curl', category: 'biceps' },
     ],
   },
-  2: { // ME Lower
+  2: { // ME Lower — posterior chain supplemental, Reverse Hyper + GHR
     secondaries: [
       { name: 'Deficit Deadlift (1")', category: 'deadlift-secondary' },
     ],
     accessories: [
       { name: 'Reverse Hyper', category: 'posterior-chain' },
-      { name: 'Leg Press', category: 'quad-accessory' },
       { name: 'GHR', category: 'posterior-chain' },
+      { name: 'Ab Wheel', category: 'core' },
     ],
   },
-  3: { // DE Upper
+  3: { // DE Upper — lockout supplemental, rows, tricep-heavy accessories
     secondaries: [
-      { name: 'Overhead Press', category: 'shoulders-press' },
+      { name: 'Floor Press', category: 'bench-secondary' },
       { name: 'Weighted Pull-up', category: 'vertical-pull' },
     ],
     accessories: [
-      { name: 'Overhead Tricep Ext (cable)', category: 'triceps' },
-      { name: 'Cable Fly (low)', category: 'chest-accessory' },
+      { name: 'Skull Crushers', category: 'triceps' },
+      { name: 'Face Pull', category: 'shoulders-isolation' },
       { name: 'Cable Curl', category: 'biceps' },
     ],
   },
-  4: { // DE Lower
+  4: { // DE Lower — Good Mornings supplemental, Reverse Hyper + GHR (the Westside staples)
     secondaries: [
-      { name: 'Speed Deadlift', category: 'explosive' },
+      { name: 'Good Morning', category: 'posterior-chain' },
     ],
     accessories: [
-      { name: 'Leg Press', category: 'quad-accessory' },
-      { name: 'Nordic Curl', category: 'posterior-chain' },
+      { name: 'Reverse Hyper', category: 'posterior-chain' },
+      { name: 'GHR', category: 'posterior-chain' },
       { name: 'Ab Wheel', category: 'core' },
     ],
   },
@@ -168,13 +168,19 @@ export async function generateWorkoutSets(
   if (isVolume) {
     // Top sets for volume days (DE speed work on conjugate, gauge set on DUP)
     if (template.volumeTopSets) {
-      const vTopReps = template.volumeTopReps ?? template.topReps;
+      let vTopReps = template.volumeTopReps ?? template.topReps;
+      let vTopSets = template.volumeTopSets;
       const vTopRPE = template.volumeTopRPE ?? template.topRPE;
+
+      // Westside DE overrides: speed bench is always triples, speed squat is always doubles
+      if (blockType === 'conj-4' && dayNumber === 3) { vTopSets = 9; vTopReps = 3; }
+      if (blockType === 'conj-4' && dayNumber === 4) { vTopSets = 12; vTopReps = 2; }
+
       // Use direct percentage for speed/DE work, otherwise RPE-based calculation
       const vTopWeight = template.volumeTopPercent
         ? roundTo5(trainingMax * template.volumeTopPercent * fatigueMult)
         : roundTo5(calculateGoalWeight(trainingMax, vTopReps, vTopRPE) * fatigueMult);
-      for (let i = 0; i < template.volumeTopSets; i++) {
+      for (let i = 0; i < vTopSets; i++) {
         sets.push(makeSet({
           exerciseId: primary.id, exerciseName: primary.name, setType: 'top',
           setNumber: ++setNum, goalWeight: vTopWeight,

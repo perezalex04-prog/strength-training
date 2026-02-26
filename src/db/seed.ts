@@ -110,5 +110,19 @@ export async function seedDatabase() {
         await db.sessions.bulkDelete(staleIds);
       }
     }
+
+    // V3: Regenerate conj-4 sessions for authentic Westside exercise defaults + DE rep fixes
+    if (conjWeek1 && !(conjWeek1 as any)._wsV3) {
+      await db.templates.update(conjWeek1.id, { _wsV3: true } as any);
+      const staleSessions = await db.sessions
+        .where('blockType').equals('conj-4')
+        .filter((s) => !s.completed)
+        .toArray();
+      if (staleSessions.length > 0) {
+        const staleIds = staleSessions.map((s) => s.id);
+        await db.sets.where('sessionId').anyOf(staleIds).delete();
+        await db.sessions.bulkDelete(staleIds);
+      }
+    }
   }
 }
