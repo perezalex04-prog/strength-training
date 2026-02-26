@@ -8,7 +8,7 @@ import { useSettings } from '@/hooks/useSettings';
 import { useActiveWorkout, type OneRMUpdate } from '@/hooks/useActiveWorkout';
 import { useRestTimer } from '@/hooks/useRestTimer';
 import { BLOCK_LABELS, BLOCK_TYPES, BLOCK_MAX_WEEKS, getDayConfigForBlock } from '@/db/types';
-import type { SetType, DayNumber, WorkoutSet, BlockType } from '@/db/types';
+import type { SetType, DayNumber, WorkoutSet, BlockType, ExerciseCategory } from '@/db/types';
 
 function usePersistedState<T>(key: string, defaultValue: T, parse: (v: string) => T, serialize: (v: T) => string = String as any): [T, (v: T) => void] {
   const [value, setValue] = useState<T>(() => {
@@ -25,6 +25,11 @@ function usePersistedState<T>(key: string, defaultValue: T, parse: (v: string) =
 }
 
 const SET_TYPE_ORDER: SetType[] = ['top', 'backoff', 'volume', 'secondary', 'accessory', 'optional'];
+
+/** Conjugate lower days allow swapping between squat and deadlift variations */
+const CONJ_LOWER_CATEGORIES: ExerciseCategory[] = [
+  'squat-primary', 'squat-secondary', 'deadlift-primary', 'deadlift-secondary',
+];
 const SET_TYPE_LABELS: Record<SetType, string> = {
   top: 'Top Sets',
   backoff: 'Back-off Sets',
@@ -253,17 +258,25 @@ export function WorkoutPage() {
 
       {/* Sets */}
       <div className="px-4 py-3 space-y-4 pb-24">
-        {groups.map((group) => (
-          <SetGroup
-            key={group.key}
-            label={group.label}
-            sets={group.sets}
-            onUpdate={workout.updateSet}
-            onSwapExercise={workout.swapExercise}
-            onUpdateNotes={workout.updateNotes}
-            prevWeekBest={group.key === 'top' ? workout.prevWeekBests[activeDay] : undefined}
-          />
-        ))}
+        {groups.map((group) => {
+          // Conjugate lower days: expand picker to show both squat + deadlift for primary groups
+          const isPrimaryGroup = group.key === 'top' || group.key === 'backoff' || group.key === 'volume';
+          const isConjLower = settings.currentBlockType === 'conj-4' && (activeDay === 2 || activeDay === 4);
+          const overrideCategories = isPrimaryGroup && isConjLower ? CONJ_LOWER_CATEGORIES : undefined;
+
+          return (
+            <SetGroup
+              key={group.key}
+              label={group.label}
+              sets={group.sets}
+              onUpdate={workout.updateSet}
+              onSwapExercise={workout.swapExercise}
+              onUpdateNotes={workout.updateNotes}
+              prevWeekBest={group.key === 'top' ? workout.prevWeekBests[activeDay] : undefined}
+              filterCategories={overrideCategories}
+            />
+          );
+        })}
 
         {sets.length === 0 && (
           <div className="text-center py-12 text-slate-600">

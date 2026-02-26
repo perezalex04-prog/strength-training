@@ -9,6 +9,8 @@ interface ExercisePickerProps {
   onSelect: (exerciseId: string, exerciseName: string) => void;
   /** If provided, filter to this category's muscle group. If null, show all exercises. */
   category: ExerciseCategory | null;
+  /** If provided, overrides category filtering with explicit list of categories. */
+  filterCategories?: ExerciseCategory[];
 }
 
 const MUSCLE_GROUPS: { label: string; categories: ExerciseCategory[] }[] = [
@@ -28,7 +30,7 @@ function getGroupCategories(cat: ExerciseCategory): ExerciseCategory[] {
   return group ? group.categories : [cat];
 }
 
-export function ExercisePicker({ isOpen, onClose, onSelect, category }: ExercisePickerProps) {
+export function ExercisePicker({ isOpen, onClose, onSelect, category, filterCategories }: ExercisePickerProps) {
   const [search, setSearch] = useState('');
   const [viewportHeight, setViewportHeight] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -47,7 +49,7 @@ export function ExercisePicker({ isOpen, onClose, onSelect, category }: Exercise
     return () => vv.removeEventListener('resize', handleResize);
   }, [isOpen]);
 
-  const targetCategories = category ? getGroupCategories(category) : null;
+  const targetCategories = filterCategories ?? (category ? getGroupCategories(category) : null);
 
   const exercises = useLiveQuery(
     async () => {
@@ -57,7 +59,7 @@ export function ExercisePicker({ isOpen, onClose, onSelect, category }: Exercise
       }
       return db.exercises.orderBy('name').toArray();
     },
-    [isOpen, category],
+    [isOpen, category, filterCategories],
   );
 
   if (!isOpen) return null;

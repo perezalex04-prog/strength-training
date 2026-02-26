@@ -12,9 +12,11 @@ interface SetGroupProps {
   onSwapExercise?: (setIds: string[], exerciseId: string, exerciseName: string) => void;
   onUpdateNotes?: (setId: string, notes: string) => void;
   prevWeekBest?: { weight: number; reps: number; rpe: number; e1rm: number };
+  /** Override categories for the exercise picker (e.g. conjugate lower shows squat + deadlift) */
+  filterCategories?: ExerciseCategory[];
 }
 
-export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes, prevWeekBest }: SetGroupProps) {
+export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes, prevWeekBest, filterCategories }: SetGroupProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const notesRef = useRef<HTMLTextAreaElement>(null);
@@ -168,6 +170,7 @@ export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes,
         onClose={() => setPickerOpen(false)}
         onSelect={handleSwap}
         category={category}
+        filterCategories={filterCategories}
       />
     </>
   );
