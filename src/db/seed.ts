@@ -68,41 +68,46 @@ export async function seedDatabase() {
       }
     }
 
-    // Migrate: update existing conj-4 templates to Westside prescriptions
+    // Migrate: always keep conj-4 templates in sync with latest data
     const conjTemplates = (templateData as any[]).filter((t) => t.blockType === 'conj-4');
-    // Check if conj-4 templates need the Westside update (volumeTopPercent missing)
-    const existingConj = await db.templates.where({ blockType: 'conj-4', weekNumber: 1 }).first();
-    if (existingConj && !(existingConj as any).volumeTopPercent) {
-      for (const tpl of conjTemplates) {
-        await db.templates.update(tpl.id, {
-          phase: tpl.phase,
-          topSets: tpl.topSets,
-          topReps: tpl.topReps,
-          topRPE: tpl.topRPE,
-          backoffSets: tpl.backoffSets,
-          backoffReps: tpl.backoffReps,
-          backoffRPE: tpl.backoffRPE,
-          secondarySets: tpl.secondarySets,
-          secondaryReps: tpl.secondaryReps,
-          secondaryRPE: tpl.secondaryRPE,
-          accessorySets: tpl.accessorySets,
-          accessoryReps: tpl.accessoryReps,
-          accessoryRPE: tpl.accessoryRPE,
-          volumeTopSets: tpl.volumeTopSets,
-          volumeTopReps: tpl.volumeTopReps,
-          volumeTopRPE: tpl.volumeTopRPE,
-          volumeTopPercent: tpl.volumeTopPercent,
-          volumeBackoffSets: tpl.volumeBackoffSets,
-          volumeBackoffReps: tpl.volumeBackoffReps,
-          volumeBackoffRPE: tpl.volumeBackoffRPE,
-        });
-      }
-      // Delete stale conj-4 sessions & sets so they regenerate with correct weights
-      const staleSessions = await db.sessions.where('blockType').equals('conj-4').toArray();
+    for (const tpl of conjTemplates) {
+      await db.templates.update(tpl.id, {
+        phase: tpl.phase,
+        topSets: tpl.topSets,
+        topReps: tpl.topReps,
+        topRPE: tpl.topRPE,
+        backoffSets: tpl.backoffSets,
+        backoffReps: tpl.backoffReps,
+        backoffRPE: tpl.backoffRPE,
+        secondarySets: tpl.secondarySets,
+        secondaryReps: tpl.secondaryReps,
+        secondaryRPE: tpl.secondaryRPE,
+        accessorySets: tpl.accessorySets,
+        accessoryReps: tpl.accessoryReps,
+        accessoryRPE: tpl.accessoryRPE,
+        volumeTopSets: tpl.volumeTopSets,
+        volumeTopReps: tpl.volumeTopReps,
+        volumeTopRPE: tpl.volumeTopRPE,
+        volumeTopPercent: tpl.volumeTopPercent,
+        volumeBackoffSets: tpl.volumeBackoffSets,
+        volumeBackoffReps: tpl.volumeBackoffReps,
+        volumeBackoffRPE: tpl.volumeBackoffRPE,
+      });
+    }
+
+    // One-time: delete stale conj-4 sessions with RPE-based DE weights
+    // Uses a version flag so this only runs once per device
+    const conjWeek1 = await db.templates.where({ blockType: 'conj-4', weekNumber: 1 }).first();
+    if (conjWeek1 && !(conjWeek1 as any)._wsV2) {
+      await db.templates.update(conjWeek1.id, { _wsV2: true } as any);
+      const staleSessions = await db.sessions
+        .where('blockType').equals('conj-4')
+        .filter((s) => !s.completed)
+        .toArray();
       if (staleSessions.length > 0) {
         const staleIds = staleSessions.map((s) => s.id);
         await db.sets.where('sessionId').anyOf(staleIds).delete();
-        await db.sessions.where('blockType').equals('conj-4').delete();
+        await db.sessions.bulkDelete(staleIds);
       }
     }
   }
