@@ -1,4 +1,4 @@
-export type BlockType = 'linear-6' | 'linear-8' | 'linear-4' | 'dup-6' | 'wave-6' | 'conj-4' | 'peak-8';
+export type BlockType = 'linear-6' | 'linear-8' | 'linear-4' | 'dup-6' | 'wave-6' | 'conj-4' | 'peak-8' | 'texas-4' | 'block-12';
 
 export type Phase = 'accumulation' | 'transmutation' | 'realization' | 'deload';
 
@@ -149,18 +149,22 @@ export const BLOCK_MAX_WEEKS: Record<BlockType, number> = {
   'wave-6': 6,
   'conj-4': 4,
   'peak-8': 8,
+  'texas-4': 4,
+  'block-12': 12,
 };
 
-export const BLOCK_TYPES: BlockType[] = ['linear-8', 'linear-6', 'linear-4', 'dup-6', 'wave-6', 'conj-4', 'peak-8'];
+export const BLOCK_TYPES: BlockType[] = ['linear-8', 'linear-6', 'linear-4', 'dup-6', 'wave-6', 'conj-4', 'texas-4', 'block-12', 'peak-8'];
 
 export const BLOCK_LABELS: Record<BlockType, string> = {
   'linear-6': 'Linear 6-Week',
   'linear-8': 'Linear 8-Week',
-  'linear-4': 'Linear 4-Week',
+  'linear-4': '5/3/1 (Wendler)',
   'dup-6': 'DUP 6-Week',
   'wave-6': 'Wave 6-Week',
   'conj-4': 'Westside 4-Week',
   'peak-8': 'Meet Peak 8-Week',
+  'texas-4': 'Texas Method',
+  'block-12': 'Block Periodization 12-Wk',
 };
 
 export const PHASE_LABELS: Record<Phase, string> = {
@@ -199,7 +203,22 @@ const CONJ_DAY_CONFIG: DayConfig[] = [
   { dayNumber: 4, label: 'Day 4 — DE Lower', shortLabel: 'DE Lower', primaryLift: 'squat', isVolume: true },
 ];
 
+const WENDLER_DAY_CONFIG: DayConfig[] = [
+  { dayNumber: 1, label: 'Day 1 — Squat', shortLabel: 'D1 Squat', primaryLift: 'squat', isVolume: false },
+  { dayNumber: 2, label: 'Day 2 — Bench', shortLabel: 'D2 Bench', primaryLift: 'bench', isVolume: false },
+  { dayNumber: 3, label: 'Day 3 — Deadlift', shortLabel: 'D3 Dead', primaryLift: 'deadlift', isVolume: false },
+  { dayNumber: 4, label: 'Day 4 — OHP', shortLabel: 'D4 OHP', primaryLift: 'bench', isVolume: false },
+];
+
+const TEXAS_DAY_CONFIG: DayConfig[] = [
+  { dayNumber: 1, label: 'Day 1 — Volume', shortLabel: 'Volume', primaryLift: 'squat', isVolume: true },
+  { dayNumber: 2, label: 'Day 2 — Recovery', shortLabel: 'Recovery', primaryLift: 'bench', isVolume: true },
+  { dayNumber: 3, label: 'Day 3 — Intensity', shortLabel: 'Intensity', primaryLift: 'deadlift', isVolume: false },
+];
+
 export function getDayConfigForBlock(blockType: BlockType): DayConfig[] {
   if (blockType === 'conj-4') return CONJ_DAY_CONFIG;
+  if (blockType === 'linear-4') return WENDLER_DAY_CONFIG;
+  if (blockType === 'texas-4') return TEXAS_DAY_CONFIG;
   return DAY_CONFIG;
 }

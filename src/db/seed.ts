@@ -36,7 +36,7 @@ export async function seedDatabase() {
     await db.templates.bulkAdd(templateData as any);
   } else {
     // Migrate: add new block types for existing users
-    const newBlockTypes = ['conj-4', 'peak-8'];
+    const newBlockTypes = ['conj-4', 'peak-8', 'texas-4', 'block-12'];
     for (const bt of newBlockTypes) {
       const count = await db.templates.where({ blockType: bt, weekNumber: 1 }).count();
       if (count === 0) {
@@ -116,6 +116,41 @@ export async function seedDatabase() {
       await db.templates.update(conjWeek1.id, { _wsV3: true } as any);
       const staleSessions = await db.sessions
         .where('blockType').equals('conj-4')
+        .filter((s) => !s.completed)
+        .toArray();
+      if (staleSessions.length > 0) {
+        const staleIds = staleSessions.map((s) => s.id);
+        await db.sets.where('sessionId').anyOf(staleIds).delete();
+        await db.sessions.bulkDelete(staleIds);
+      }
+    }
+
+    // Migrate: always keep linear-4 (5/3/1) templates in sync with latest data
+    const wendlerTemplates = (templateData as any[]).filter((t) => t.blockType === 'linear-4');
+    for (const tpl of wendlerTemplates) {
+      await db.templates.update(tpl.id, {
+        phase: tpl.phase,
+        topSets: tpl.topSets,
+        topReps: tpl.topReps,
+        topRPE: tpl.topRPE,
+        backoffSets: tpl.backoffSets,
+        backoffReps: tpl.backoffReps,
+        backoffRPE: tpl.backoffRPE,
+        secondarySets: tpl.secondarySets,
+        secondaryReps: tpl.secondaryReps,
+        secondaryRPE: tpl.secondaryRPE,
+        accessorySets: tpl.accessorySets,
+        accessoryReps: tpl.accessoryReps,
+        accessoryRPE: tpl.accessoryRPE,
+      });
+    }
+
+    // V4: Regenerate stale linear-4 sessions (day structure changed from 5→4 for 5/3/1)
+    const wendlerWeek1 = await db.templates.where({ blockType: 'linear-4', weekNumber: 1 }).first();
+    if (wendlerWeek1 && !(wendlerWeek1 as any)._wsV4) {
+      await db.templates.update(wendlerWeek1.id, { _wsV4: true } as any);
+      const staleSessions = await db.sessions
+        .where('blockType').equals('linear-4')
         .filter((s) => !s.completed)
         .toArray();
       if (staleSessions.length > 0) {

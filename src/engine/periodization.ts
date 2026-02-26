@@ -77,6 +77,111 @@ const PRIMARY_EXERCISES: Record<DayNumber, { name: string; category: ExerciseCat
   5: { name: 'Banded Bench', category: 'bench-primary' },
 };
 
+// === 5/3/1 (Wendler) constants ===
+const WENDLER_SETS: Record<number, { percent: number; reps: number }[]> = {
+  1: [{ percent: 0.65, reps: 5 }, { percent: 0.75, reps: 5 }, { percent: 0.85, reps: 5 }],   // 5s week
+  2: [{ percent: 0.70, reps: 3 }, { percent: 0.80, reps: 3 }, { percent: 0.90, reps: 3 }],   // 3s week
+  3: [{ percent: 0.75, reps: 5 }, { percent: 0.85, reps: 3 }, { percent: 0.95, reps: 1 }],   // 5/3/1 week
+  4: [{ percent: 0.40, reps: 5 }, { percent: 0.50, reps: 5 }, { percent: 0.60, reps: 5 }],   // deload
+};
+const OHP_TM_MULTIPLIER = 0.65;
+const BBB_PERCENT = 0.55;
+
+// 5/3/1 4-day exercise maps
+const WENDLER_PRIMARY_EXERCISES: Partial<Record<DayNumber, { name: string; category: ExerciseCategory }>> = {
+  1: { name: 'Competition Back Squat', category: 'squat-primary' },
+  2: { name: 'Competition Bench', category: 'bench-primary' },
+  3: { name: 'Competition Deadlift', category: 'deadlift-primary' },
+  4: { name: 'Overhead Press', category: 'shoulders-press' },
+};
+
+const WENDLER_DAY_EXERCISE_DEFAULTS: Partial<Record<DayNumber, { secondaries: SlotDef[]; accessories: SlotDef[] }>> = {
+  1: { // Squat day — push/pull/legs assistance
+    secondaries: [
+      { name: 'Leg Press', category: 'quad-accessory' },
+    ],
+    accessories: [
+      { name: 'Nordic Curl', category: 'posterior-chain' },
+      { name: 'Ab Wheel', category: 'core' },
+      { name: 'DB Curl', category: 'biceps' },
+    ],
+  },
+  2: { // Bench day — push/pull assistance
+    secondaries: [
+      { name: 'Incline Bench', category: 'bench-secondary' },
+      { name: 'Barbell Row', category: 'horizontal-row' },
+    ],
+    accessories: [
+      { name: 'Tricep Pushdown (rope)', category: 'triceps' },
+      { name: 'Face Pull', category: 'shoulders-isolation' },
+      { name: 'Spider Curl', category: 'biceps' },
+    ],
+  },
+  3: { // Deadlift day — posterior chain assistance
+    secondaries: [
+      { name: 'Good Morning', category: 'posterior-chain' },
+    ],
+    accessories: [
+      { name: 'GHR', category: 'posterior-chain' },
+      { name: 'Ab Wheel', category: 'core' },
+      { name: 'Leg Press', category: 'quad-accessory' },
+    ],
+  },
+  4: { // OHP day — shoulder/upper assistance
+    secondaries: [
+      { name: 'DB Shoulder Press', category: 'shoulders-press' },
+      { name: 'Weighted Pull-up', category: 'vertical-pull' },
+    ],
+    accessories: [
+      { name: 'Lateral Raise', category: 'shoulders-isolation' },
+      { name: 'Overhead Tricep Ext (cable)', category: 'triceps' },
+      { name: 'Cable Curl', category: 'biceps' },
+    ],
+  },
+};
+
+// Texas Method 3-day exercise maps
+const TEXAS_PRIMARY_EXERCISES: Partial<Record<DayNumber, { name: string; category: ExerciseCategory }>> = {
+  1: { name: 'Competition Back Squat', category: 'squat-primary' },   // Volume
+  2: { name: 'Competition Bench', category: 'bench-primary' },        // Recovery
+  3: { name: 'Competition Deadlift', category: 'deadlift-primary' },  // Intensity
+};
+
+const TEXAS_DAY_EXERCISE_DEFAULTS: Partial<Record<DayNumber, { secondaries: SlotDef[]; accessories: SlotDef[] }>> = {
+  1: { // Volume day — heavy squats + bench volume
+    secondaries: [
+      { name: 'Competition Bench', category: 'bench-primary' },
+      { name: 'Barbell Row', category: 'horizontal-row' },
+    ],
+    accessories: [
+      { name: 'Leg Press', category: 'quad-accessory' },
+      { name: 'GHR', category: 'posterior-chain' },
+      { name: 'Ab Wheel', category: 'core' },
+    ],
+  },
+  2: { // Recovery day — light bench + OHP + pulls
+    secondaries: [
+      { name: 'Overhead Press', category: 'shoulders-press' },
+      { name: 'Weighted Pull-up', category: 'vertical-pull' },
+    ],
+    accessories: [
+      { name: 'Face Pull', category: 'shoulders-isolation' },
+      { name: 'Tricep Pushdown (rope)', category: 'triceps' },
+      { name: 'DB Curl', category: 'biceps' },
+    ],
+  },
+  3: { // Intensity day — heavy deadlift + heavy squat
+    secondaries: [
+      { name: 'Competition Back Squat', category: 'squat-primary' },
+    ],
+    accessories: [
+      { name: 'Reverse Hyper', category: 'posterior-chain' },
+      { name: 'Nordic Curl', category: 'posterior-chain' },
+      { name: 'Ab Wheel', category: 'core' },
+    ],
+  },
+};
+
 // Westside Conjugate 4-day exercise maps
 const CONJ_PRIMARY_EXERCISES: Partial<Record<DayNumber, { name: string; category: ExerciseCategory }>> = {
   1: { name: 'Competition Bench', category: 'bench-primary' },       // ME Upper
@@ -154,9 +259,19 @@ export async function generateWorkoutSets(
   const sets: Omit<WorkoutSet, 'id' | 'sessionId'>[] = [];
   let setNum = 0;
 
-  const primaryDef = (blockType === 'conj-4' ? CONJ_PRIMARY_EXERCISES[dayNumber] : null) ?? PRIMARY_EXERCISES[dayNumber];
+  const primaryDef = (
+    blockType === 'conj-4' ? CONJ_PRIMARY_EXERCISES[dayNumber] :
+    blockType === 'linear-4' ? WENDLER_PRIMARY_EXERCISES[dayNumber] :
+    blockType === 'texas-4' ? TEXAS_PRIMARY_EXERCISES[dayNumber] :
+    null
+  ) ?? PRIMARY_EXERCISES[dayNumber];
   const primary = await findExercise(primaryDef.name, primaryDef.category);
-  const dayDefaults = (blockType === 'conj-4' ? CONJ_DAY_EXERCISE_DEFAULTS[dayNumber] : null) ?? DAY_EXERCISE_DEFAULTS[dayNumber];
+  const dayDefaults = (
+    blockType === 'conj-4' ? CONJ_DAY_EXERCISE_DEFAULTS[dayNumber] :
+    blockType === 'linear-4' ? WENDLER_DAY_EXERCISE_DEFAULTS[dayNumber] :
+    blockType === 'texas-4' ? TEXAS_DAY_EXERCISE_DEFAULTS[dayNumber] :
+    null
+  ) ?? DAY_EXERCISE_DEFAULTS[dayNumber];
 
   // === AUTOREGULATION: Fatigue multiplier from completed sessions this week ===
   const fatigueMult = await calculateFatigueMultiplier(blockType, weekNumber);
@@ -165,7 +280,34 @@ export async function generateWorkoutSets(
   const volumeAdj = await calculateVolumeAdjustment(blockType, weekNumber);
 
   // === PRIMARY LIFT ===
-  if (isVolume) {
+  if (blockType === 'linear-4') {
+    // === 5/3/1 (WENDLER) — percentage-based ramping sets ===
+    let wendlerTM = trainingMax;
+    // Day 4 (OHP) uses bench 1RM with reduced multiplier
+    if (dayNumber === 4) wendlerTM = roundTo5(trainingMax * OHP_TM_MULTIPLIER);
+
+    const wendlerSets = WENDLER_SETS[weekNumber] ?? WENDLER_SETS[1];
+    for (const ws of wendlerSets) {
+      const goalWeight = roundTo5(wendlerTM * ws.percent);
+      sets.push(makeSet({
+        exerciseId: primary.id, exerciseName: primary.name, setType: 'top',
+        setNumber: ++setNum, goalWeight,
+        goalReps: ws.reps, goalRPE: 0, category: primaryDef.category,
+      }));
+    }
+
+    // BBB supplemental: 5×10 at 55% of TM (skip on deload week)
+    if (weekNumber !== 4 && template.backoffSets > 0) {
+      const bbbWeight = roundTo5(wendlerTM * BBB_PERCENT);
+      for (let i = 0; i < template.backoffSets; i++) {
+        sets.push(makeSet({
+          exerciseId: primary.id, exerciseName: primary.name, setType: 'backoff',
+          setNumber: ++setNum, goalWeight: bbbWeight,
+          goalReps: template.backoffReps, goalRPE: template.backoffRPE, category: primaryDef.category,
+        }));
+      }
+    }
+  } else if (isVolume) {
     // Top sets for volume days (DE speed work on conjugate, gauge set on DUP)
     if (template.volumeTopSets) {
       let vTopReps = template.volumeTopReps ?? template.topReps;
@@ -177,8 +319,15 @@ export async function generateWorkoutSets(
       if (blockType === 'conj-4' && dayNumber === 4) { vTopSets = 12; vTopReps = 2; }
 
       // Use direct percentage for speed/DE work, otherwise RPE-based calculation
-      const vTopWeight = template.volumeTopPercent
-        ? roundTo5(trainingMax * template.volumeTopPercent * fatigueMult)
+      let vTopPercent = template.volumeTopPercent;
+
+      // Texas Method: Recovery day (Day 2) uses reduced percentage
+      if (blockType === 'texas-4' && dayNumber === 2 && vTopPercent) {
+        vTopPercent *= 0.80;
+      }
+
+      const vTopWeight = vTopPercent
+        ? roundTo5(trainingMax * vTopPercent * fatigueMult)
         : roundTo5(calculateGoalWeight(trainingMax, vTopReps, vTopRPE) * fatigueMult);
       for (let i = 0; i < vTopSets; i++) {
         sets.push(makeSet({
@@ -189,17 +338,19 @@ export async function generateWorkoutSets(
       }
     }
 
-    // Volume/supplemental sets
-    const volReps = template.volumeBackoffReps ?? template.backoffReps;
-    const volRPE = template.volumeBackoffRPE ?? template.backoffRPE;
-    const volSets = template.volumeBackoffSets ?? 4;
-    const volWeight = roundTo5(calculateGoalWeight(trainingMax, volReps, volRPE) * fatigueMult);
-    for (let i = 0; i < volSets; i++) {
-      sets.push(makeSet({
-        exerciseId: primary.id, exerciseName: primary.name, setType: 'volume',
-        setNumber: ++setNum, goalWeight: volWeight,
-        goalReps: volReps, goalRPE: volRPE, category: primaryDef.category,
-      }));
+    // Volume/supplemental sets — skip for Texas Recovery day (Day 2)
+    if (!(blockType === 'texas-4' && dayNumber === 2)) {
+      const volReps = template.volumeBackoffReps ?? template.backoffReps;
+      const volRPE = template.volumeBackoffRPE ?? template.backoffRPE;
+      const volSets = template.volumeBackoffSets ?? 4;
+      const volWeight = roundTo5(calculateGoalWeight(trainingMax, volReps, volRPE) * fatigueMult);
+      for (let i = 0; i < volSets; i++) {
+        sets.push(makeSet({
+          exerciseId: primary.id, exerciseName: primary.name, setType: 'volume',
+          setNumber: ++setNum, goalWeight: volWeight,
+          goalReps: volReps, goalRPE: volRPE, category: primaryDef.category,
+        }));
+      }
     }
   } else {
     const topGoalWeight = roundTo5(calculateGoalWeight(trainingMax, template.topReps, template.topRPE) * fatigueMult);
