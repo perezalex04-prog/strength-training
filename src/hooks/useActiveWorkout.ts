@@ -3,6 +3,7 @@ import { db } from '@/db/database';
 import { generateWorkoutSets } from '@/engine/periodization';
 import { computeSetDerived, updateExercisePRs, findBestSet, createProgressionSnapshot } from '@/engine/progression';
 import { calculateAutoregulatedBackoff, checkForNewPR } from '@/engine/autoregulation';
+import { calculateGoalWeight, roundTo5 } from '@/engine/e1rm';
 import type { UserSettings, WorkoutSession, WorkoutSet, DayNumber, PrimaryLift } from '@/db/types';
 import { getDayConfigForBlock } from '@/db/types';
 
@@ -153,6 +154,60 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     await Promise.all(
       setIds.map((id) => db.sets.update(id, { exerciseId, exerciseName })),
     );
+
+    // Conjugate: recalculate primary lift weights when swapping to a different lift category
+    if (!settings || settings.currentBlockType !== 'conj-4' || setIds.length === 0) return;
+
+    const firstSet = await db.sets.get(setIds[0]);
+    if (!firstSet || (firstSet.setType !== 'top' && firstSet.setType !== 'backoff' && firstSet.setType !== 'volume')) return;
+
+    const exercise = await db.exercises.get(exerciseId);
+    if (!exercise) return;
+
+    // Determine which 1RM the new exercise maps to
+    let newLift: PrimaryLift | null = null;
+    if (exercise.category.startsWith('deadlift')) newLift = 'deadlift';
+    else if (exercise.category.startsWith('squat')) newLift = 'squat';
+    else if (exercise.category.startsWith('bench')) newLift = 'bench';
+    if (!newLift) return;
+
+    const session = await db.sessions.get(firstSet.sessionId);
+    if (!session || session.primaryLift === newLift) return;
+
+    // Update session's primary lift
+    await db.sessions.update(session.id, { primaryLift: newLift });
+
+    // Recalculate goal weights for all primary sets using new 1RM
+    const newOneRM = settings[`${newLift}1RM` as keyof UserSettings] as number;
+    const trainingMax = Math.round(newOneRM * settings.trainingMaxPercent);
+    const template = await db.templates
+      .where({ blockType: settings.currentBlockType, weekNumber: settings.currentWeek })
+      .first();
+    if (!template) return;
+
+    const allSessionSets = await db.sets.where('sessionId').equals(session.id).toArray();
+    const primarySets = allSessionSets.filter(
+      (s) => s.setType === 'top' || s.setType === 'backoff' || s.setType === 'volume',
+    );
+
+    const dayConfig = getDayConfigForBlock(settings.currentBlockType).find((d) => d.dayNumber === session.dayNumber);
+    const fatigueMult = 1.0; // Don't re-query fatigue on swap
+
+    for (const s of primarySets) {
+      let newWeight: number;
+      if (s.setType === 'top' && dayConfig?.isVolume && template.volumeTopPercent) {
+        newWeight = roundTo5(trainingMax * template.volumeTopPercent * fatigueMult);
+      } else if (s.setType === 'top') {
+        newWeight = roundTo5(calculateGoalWeight(trainingMax, s.goalReps, s.goalRPE));
+      } else if (s.setType === 'backoff') {
+        newWeight = roundTo5(calculateGoalWeight(trainingMax, s.goalReps, s.goalRPE));
+      } else {
+        newWeight = roundTo5(calculateGoalWeight(trainingMax, s.goalReps, s.goalRPE));
+      }
+      if (s.actualWeight == null) {
+        await db.sets.update(s.id, { goalWeight: newWeight });
+      }
+    }
   }
 
   async function completeSession(sessionId: string): Promise<OneRMUpdate[]> {
