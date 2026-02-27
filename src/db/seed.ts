@@ -139,6 +139,20 @@ export async function seedDatabase() {
       }
     }
 
+    // V6: Add speed pulls to DE Lower day
+    if (conjWeek1 && !(conjWeek1 as any)._wsV6) {
+      await db.templates.update(conjWeek1.id, { _wsV6: true } as any);
+      const staleSessions = await db.sessions
+        .where('blockType').equals('conj-4')
+        .filter((s) => !s.completed)
+        .toArray();
+      if (staleSessions.length > 0) {
+        const staleIds = staleSessions.map((s) => s.id);
+        await db.sets.where('sessionId').anyOf(staleIds).delete();
+        await db.sessions.bulkDelete(staleIds);
+      }
+    }
+
     // Migrate: always keep linear-4 (5/3/1) templates in sync with latest data
     const wendlerTemplates = (templateData as any[]).filter((t) => t.blockType === 'linear-4');
     for (const tpl of wendlerTemplates) {

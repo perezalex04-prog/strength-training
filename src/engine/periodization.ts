@@ -223,8 +223,9 @@ const CONJ_DAY_EXERCISE_DEFAULTS: Partial<Record<DayNumber, { secondaries: SlotD
       { name: 'Cable Curl', category: 'biceps' },
     ],
   },
-  4: { // DE Lower — Good Mornings supplemental, Reverse Hyper + GHR (the Westside staples)
+  4: { // DE Lower — speed pulls + Good Mornings, Reverse Hyper + GHR (the Westside staples)
     secondaries: [
+      { name: 'Competition Deadlift', category: 'deadlift-primary' },
       { name: 'Good Morning', category: 'posterior-chain' },
     ],
     accessories: [
