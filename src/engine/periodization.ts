@@ -182,6 +182,14 @@ const TEXAS_DAY_EXERCISE_DEFAULTS: Partial<Record<DayNumber, { secondaries: Slot
   },
 };
 
+// Westside DE Lower speed pull config — explosive singles at % of deadlift TM
+const CONJ_SPEED_PULL: Record<number, { sets: number; reps: number; percent: number }> = {
+  1: { sets: 6, reps: 1, percent: 0.60 },
+  2: { sets: 6, reps: 1, percent: 0.65 },
+  3: { sets: 8, reps: 1, percent: 0.70 },
+  4: { sets: 4, reps: 1, percent: 0.50 },  // deload
+};
+
 // Westside Conjugate 4-day exercise maps
 const CONJ_PRIMARY_EXERCISES: Partial<Record<DayNumber, { name: string; category: ExerciseCategory }>> = {
   1: { name: 'Competition Bench', category: 'bench-primary' },       // ME Upper
@@ -382,13 +390,34 @@ export async function generateWorkoutSets(
   // === SECONDARIES (auto-weight from PR history) ===
   for (const sec of dayDefaults.secondaries) {
     const exercise = await findExercise(sec.name, sec.category);
-    const lastWeight = await getLastWeight(exercise.id);
-    for (let i = 0; i < template.secondarySets; i++) {
-      sets.push(makeSet({
-        exerciseId: exercise.id, exerciseName: exercise.name, setType: 'secondary',
-        setNumber: ++setNum, goalWeight: lastWeight,
-        goalReps: template.secondaryReps, goalRPE: template.secondaryRPE, category: sec.category,
-      }));
+
+    // Conjugate DE Lower: speed pulls are percentage-based singles from deadlift 1RM
+    const isSpeedPull = blockType === 'conj-4' && dayNumber === 4 && isVolume
+      && (sec.category === 'deadlift-primary' || sec.category === 'deadlift-secondary');
+
+    if (isSpeedPull) {
+      const settings = await db.settings.get('singleton');
+      if (settings) {
+        const deadliftTM = Math.round(settings.deadlift1RM * settings.trainingMaxPercent);
+        const pullCfg = CONJ_SPEED_PULL[weekNumber] ?? CONJ_SPEED_PULL[1];
+        const pullWeight = roundTo5(deadliftTM * pullCfg.percent);
+        for (let i = 0; i < pullCfg.sets; i++) {
+          sets.push(makeSet({
+            exerciseId: exercise.id, exerciseName: exercise.name, setType: 'secondary',
+            setNumber: ++setNum, goalWeight: pullWeight,
+            goalReps: pullCfg.reps, goalRPE: 0, category: sec.category,
+          }));
+        }
+      }
+    } else {
+      const lastWeight = await getLastWeight(exercise.id);
+      for (let i = 0; i < template.secondarySets; i++) {
+        sets.push(makeSet({
+          exerciseId: exercise.id, exerciseName: exercise.name, setType: 'secondary',
+          setNumber: ++setNum, goalWeight: lastWeight,
+          goalReps: template.secondaryReps, goalRPE: template.secondaryRPE, category: sec.category,
+        }));
+      }
     }
   }
 
