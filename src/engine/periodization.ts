@@ -362,17 +362,19 @@ export async function generateWorkoutSets(
       }));
     }
 
-    // Backoff: RPE-based calculation instead of flat 90%
-    const backoffGoalWeight = roundTo5(calculateGoalWeight(trainingMax, template.backoffReps, template.backoffRPE) * fatigueMult);
+    // Backoff sets (skip entirely when template prescribes 0, e.g. conjugate ME days)
+    if (template.backoffSets > 0) {
+      const backoffGoalWeight = roundTo5(calculateGoalWeight(trainingMax, template.backoffReps, template.backoffRPE) * fatigueMult);
 
-    // Volume-adjusted backoff set count (clamped to at least 1)
-    const adjustedBackoffSets = Math.max(1, template.backoffSets + volumeAdj);
-    for (let i = 0; i < adjustedBackoffSets; i++) {
-      sets.push(makeSet({
-        exerciseId: primary.id, exerciseName: primary.name, setType: 'backoff',
-        setNumber: ++setNum, goalWeight: backoffGoalWeight,
-        goalReps: template.backoffReps, goalRPE: template.backoffRPE, category: primaryDef.category,
-      }));
+      // Volume-adjusted backoff set count (clamped to at least 1)
+      const adjustedBackoffSets = Math.max(1, template.backoffSets + volumeAdj);
+      for (let i = 0; i < adjustedBackoffSets; i++) {
+        sets.push(makeSet({
+          exerciseId: primary.id, exerciseName: primary.name, setType: 'backoff',
+          setNumber: ++setNum, goalWeight: backoffGoalWeight,
+          goalReps: template.backoffReps, goalRPE: template.backoffRPE, category: primaryDef.category,
+        }));
+      }
     }
   }
 

@@ -583,9 +583,9 @@
     "topSets": 1,
     "topReps": 3,
     "topRPE": 8.5,
-    "backoffSets": 3,
-    "backoffReps": 5,
-    "backoffRPE": 7.5,
+    "backoffSets": 0,
+    "backoffReps": 0,
+    "backoffRPE": 0,
     "secondarySets": 3,
     "secondaryReps": 10,
     "secondaryRPE": 7.0,
@@ -596,9 +596,9 @@
     "volumeTopReps": 3,
     "volumeTopPercent": 0.50,
     "volumeTopRPE": 6.0,
-    "volumeBackoffSets": 3,
-    "volumeBackoffReps": 8,
-    "volumeBackoffRPE": 7.0
+    "volumeBackoffSets": 0,
+    "volumeBackoffReps": 0,
+    "volumeBackoffRPE": 0
   },
   {
     "id": "tpl-032",
@@ -608,9 +608,9 @@
     "topSets": 1,
     "topReps": 2,
     "topRPE": 9.0,
-    "backoffSets": 3,
-    "backoffReps": 3,
-    "backoffRPE": 8.0,
+    "backoffSets": 0,
+    "backoffReps": 0,
+    "backoffRPE": 0,
     "secondarySets": 3,
     "secondaryReps": 8,
     "secondaryRPE": 7.5,
@@ -621,9 +621,9 @@
     "volumeTopReps": 2,
     "volumeTopPercent": 0.55,
     "volumeTopRPE": 6.5,
-    "volumeBackoffSets": 3,
-    "volumeBackoffReps": 6,
-    "volumeBackoffRPE": 7.5
+    "volumeBackoffSets": 0,
+    "volumeBackoffReps": 0,
+    "volumeBackoffRPE": 0
   },
   {
     "id": "tpl-033",
@@ -633,9 +633,9 @@
     "topSets": 1,
     "topReps": 1,
     "topRPE": 9.5,
-    "backoffSets": 2,
-    "backoffReps": 2,
-    "backoffRPE": 8.5,
+    "backoffSets": 0,
+    "backoffReps": 0,
+    "backoffRPE": 0,
     "secondarySets": 3,
     "secondaryReps": 8,
     "secondaryRPE": 7.5,
@@ -646,9 +646,9 @@
     "volumeTopReps": 2,
     "volumeTopPercent": 0.60,
     "volumeTopRPE": 6.5,
-    "volumeBackoffSets": 3,
-    "volumeBackoffReps": 6,
-    "volumeBackoffRPE": 7.5
+    "volumeBackoffSets": 0,
+    "volumeBackoffReps": 0,
+    "volumeBackoffRPE": 0
   },
   {
     "id": "tpl-034",
@@ -658,9 +658,9 @@
     "topSets": 1,
     "topReps": 3,
     "topRPE": 7.0,
-    "backoffSets": 2,
-    "backoffReps": 5,
-    "backoffRPE": 6.0,
+    "backoffSets": 0,
+    "backoffReps": 0,
+    "backoffRPE": 0,
     "secondarySets": 2,
     "secondaryReps": 10,
     "secondaryRPE": 6.0,
@@ -671,9 +671,9 @@
     "volumeTopReps": 3,
     "volumeTopPercent": 0.45,
     "volumeTopRPE": 5.5,
-    "volumeBackoffSets": 2,
-    "volumeBackoffReps": 8,
-    "volumeBackoffRPE": 6.0
+    "volumeBackoffSets": 0,
+    "volumeBackoffReps": 0,
+    "volumeBackoffRPE": 0
   },
   {
     "id": "tpl-035",
