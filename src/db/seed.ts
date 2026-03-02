@@ -139,7 +139,7 @@ export async function seedDatabase() {
       }
     }
 
-    // V6: Speed pulls as percentage-based singles on DE Lower
+    // V6: Speed pulls as percentage-based singles on DE Lower + reduce secondary reps to 5-6 range
     if (conjWeek1 && !(conjWeek1 as any)._wsV6) {
       await db.templates.update(conjWeek1.id, { _wsV6: true } as any);
       const staleSessions = await db.sessions

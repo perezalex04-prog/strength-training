@@ -2,7 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/db/database';
 import { generateWorkoutSets } from '@/engine/periodization';
 import { computeSetDerived, updateExercisePRs, findBestSet, createProgressionSnapshot } from '@/engine/progression';
-import { calculateAutoregulatedBackoff, checkForNewPR } from '@/engine/autoregulation';
+import { calculateAutoregulatedBackoff, checkForNewPR, getLastWeight } from '@/engine/autoregulation';
 import { calculateGoalWeight, roundTo5 } from '@/engine/e1rm';
 import type { UserSettings, WorkoutSession, WorkoutSet, DayNumber, PrimaryLift } from '@/db/types';
 import { getDayConfigForBlock } from '@/db/types';
@@ -155,11 +155,25 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
       setIds.map((id) => db.sets.update(id, { exerciseId, exerciseName })),
     );
 
-    // Conjugate: recalculate primary lift weights when swapping to a different lift category
-    if (!settings || settings.currentBlockType !== 'conj-4' || setIds.length === 0) return;
+    if (setIds.length === 0) return;
 
-    const firstSet = await db.sets.get(setIds[0]);
-    if (!firstSet || (firstSet.setType !== 'top' && firstSet.setType !== 'backoff' && firstSet.setType !== 'volume')) return;
+    // For non-primary sets (secondary/accessory/optional): update goal weight from new exercise's PR history
+    const swappedSet = await db.sets.get(setIds[0]);
+    if (!swappedSet) return;
+
+    if (swappedSet.setType !== 'top' && swappedSet.setType !== 'backoff' && swappedSet.setType !== 'volume') {
+      const lastWeight = await getLastWeight(exerciseId);
+      for (const id of setIds) {
+        const s = await db.sets.get(id);
+        if (s && s.actualWeight == null) {
+          await db.sets.update(id, { goalWeight: lastWeight });
+        }
+      }
+      return;
+    }
+
+    // Conjugate: recalculate primary lift weights when swapping to a different lift category
+    if (!settings || settings.currentBlockType !== 'conj-4') return;
 
     const exercise = await db.exercises.get(exerciseId);
     if (!exercise) return;
@@ -171,7 +185,7 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     else if (exercise.category.startsWith('bench')) newLift = 'bench';
     if (!newLift) return;
 
-    const session = await db.sessions.get(firstSet.sessionId);
+    const session = await db.sessions.get(swappedSet.sessionId);
     if (!session || session.primaryLift === newLift) return;
 
     // Update session's primary lift

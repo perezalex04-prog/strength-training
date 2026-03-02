@@ -10,17 +10,17 @@ import { useRestTimer } from '@/hooks/useRestTimer';
 import { BLOCK_LABELS, BLOCK_TYPES, BLOCK_MAX_WEEKS, getDayConfigForBlock } from '@/db/types';
 import type { SetType, DayNumber, WorkoutSet, BlockType, ExerciseCategory } from '@/db/types';
 
-function usePersistedState<T>(key: string, defaultValue: T, parse: (v: string) => T, serialize: (v: T) => string = String as any): [T, (v: T) => void] {
+function usePersistedState<T>(key: string, defaultValue: T, parse: (v: string) => T, serialize: (v: T) => string = String as any, storage: Storage = sessionStorage): [T, (v: T) => void] {
   const [value, setValue] = useState<T>(() => {
     try {
-      const stored = sessionStorage.getItem(key);
+      const stored = storage.getItem(key);
       return stored !== null ? parse(stored) : defaultValue;
     } catch { return defaultValue; }
   });
   const set = useCallback((v: T) => {
     setValue(v);
-    try { sessionStorage.setItem(key, serialize(v)); } catch {}
-  }, [key, serialize]);
+    try { storage.setItem(key, serialize(v)); } catch {}
+  }, [key, serialize, storage]);
   return [value, set];
 }
 
@@ -89,6 +89,7 @@ export function WorkoutPage() {
     1,
     (v) => Number(v) as DayNumber,
     (v) => String(v),
+    localStorage,
   );
   const [previewOpen, setPreviewOpen] = useState(false);
   const [rmUpdates, setRmUpdates] = useState<OneRMUpdate[]>([]);
