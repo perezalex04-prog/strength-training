@@ -101,9 +101,12 @@ export function WorkoutPage() {
     // Guard: only call getOrCreateSession once per day per mount
     if (initRef.current.has(activeDay)) return;
     initRef.current.add(activeDay);
-    // getOrCreateSession now checks IndexedDB directly, so it won't
-    // overwrite existing sessions/sets even on remount
-    workout.getOrCreateSession(activeDay, selectedDate);
+    // getOrCreateSession checks IndexedDB directly, then recalculateGoalWeights
+    // auto-updates top set goals based on previous week's actual performance
+    (async () => {
+      const session = await workout.getOrCreateSession(activeDay, selectedDate);
+      await workout.recalculateGoalWeights(session.id);
+    })();
   }, [settings, activeDay]);
 
   if (!settings) {

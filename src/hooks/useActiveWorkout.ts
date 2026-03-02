@@ -4,13 +4,59 @@ import { generateWorkoutSets } from '@/engine/periodization';
 import { computeSetDerived, updateExercisePRs, findBestSet, createProgressionSnapshot } from '@/engine/progression';
 import { calculateAutoregulatedBackoff, checkForNewPR, getLastWeight } from '@/engine/autoregulation';
 import { calculateGoalWeight, roundTo5 } from '@/engine/e1rm';
-import type { UserSettings, WorkoutSession, WorkoutSet, DayNumber, PrimaryLift } from '@/db/types';
+import type { UserSettings, WorkoutSession, WorkoutSet, DayNumber, PrimaryLift, BlockType } from '@/db/types';
 import { getDayConfigForBlock } from '@/db/types';
 
 export interface OneRMUpdate {
   lift: string;
   old: number;
   new: number;
+}
+
+/**
+ * Query previous week's best e1RM from completed top/backoff/volume sets
+ * for the same day number and primary lift.
+ */
+async function getPrevWeekBestE1RM(
+  blockType: BlockType,
+  weekNumber: number,
+  dayNumber: DayNumber,
+  primaryLift: PrimaryLift,
+): Promise<number | null> {
+  if (weekNumber <= 1) return null;
+
+  const prevWeek = weekNumber - 1;
+  const prevSessions = await db.sessions
+    .where({ blockType, weekNumber: prevWeek })
+    .filter((s) => s.dayNumber === dayNumber && s.primaryLift === primaryLift && s.completed)
+    .toArray();
+
+  if (prevSessions.length === 0) return null;
+
+  const prevSessionIds = prevSessions.map((s) => s.id);
+  const prevSets = await db.sets
+    .where('sessionId')
+    .anyOf(prevSessionIds)
+    .toArray();
+
+  // Find the set with the highest stored e1RM
+  const completedSets = prevSets.filter(
+    (s) =>
+      (s.setType === 'top' || s.setType === 'backoff' || s.setType === 'volume') &&
+      s.actualWeight != null &&
+      s.actualReps != null &&
+      s.actualRPE != null &&
+      s.e1rm != null,
+  );
+
+  if (completedSets.length === 0) return null;
+
+  let bestE1RM = 0;
+  for (const s of completedSets) {
+    if (s.e1rm! > bestE1RM) bestE1RM = s.e1rm!;
+  }
+
+  return bestE1RM > 0 ? bestE1RM : null;
 }
 
 export function useActiveWorkout(settings: UserSettings | undefined, selectedDate?: string) {
@@ -279,6 +325,65 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     return rmUpdates;
   }
 
+  // === CROSS-WEEK AUTOREGULATION ===
+  // Recalculate goal weights for unstarted sessions based on previous week's actual performance
+  async function recalculateGoalWeights(sessionId: string): Promise<void> {
+    if (!settings) return;
+
+    const session = await db.sessions.get(sessionId);
+    if (!session || session.completed) return;
+
+    const sets = await db.sets.where('sessionId').equals(sessionId).toArray();
+
+    // Guard: only recalculate unstarted sessions (no actual data logged)
+    const isUnstarted = sets.every((s) => s.actualWeight == null);
+    if (!isUnstarted) return;
+
+    // Guard: skip volume/DE days (percentage-based speed work)
+    const dayConfig = getDayConfigForBlock(session.blockType).find(
+      (d) => d.dayNumber === session.dayNumber,
+    );
+    if (dayConfig?.isVolume) return;
+
+    // Determine current training max from settings
+    const liftKey = `${session.primaryLift}1RM` as keyof UserSettings;
+    const currentOneRM = settings[liftKey] as number;
+    const currentTM = Math.round(currentOneRM * settings.trainingMaxPercent);
+
+    // Lookup previous week's best e1RM for same day + same lift
+    const prevE1RM = await getPrevWeekBestE1RM(
+      session.blockType,
+      session.weekNumber,
+      session.dayNumber,
+      session.primaryLift,
+    );
+
+    // Use the higher of prev week e1RM and current settings TM
+    // This ensures a bad week doesn't lower future goals
+    const liveTM = prevE1RM ? Math.max(prevE1RM, currentTM) : currentTM;
+
+    // Recalculate RPE-based top and backoff sets
+    const updates: { id: string; goalWeight: number }[] = [];
+    for (const set of sets) {
+      if (
+        (set.setType === 'top' || set.setType === 'backoff') &&
+        set.goalRPE > 0
+      ) {
+        const newGoalWeight = calculateGoalWeight(liveTM, set.goalReps, set.goalRPE);
+        if (newGoalWeight !== set.goalWeight) {
+          updates.push({ id: set.id, goalWeight: newGoalWeight });
+        }
+      }
+    }
+
+    // Batch write only changed sets
+    if (updates.length > 0) {
+      await Promise.all(
+        updates.map((u) => db.sets.update(u.id, { goalWeight: u.goalWeight })),
+      );
+    }
+  }
+
   // Query previous week's best top set for each primary lift day
   const prevWeekBests = useLiveQuery(
     async () => {
@@ -328,6 +433,7 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     allSets: allSets ?? [],
     prevWeekBests: prevWeekBests ?? {},
     getOrCreateSession,
+    recalculateGoalWeights,
     updateSet,
     updateNotes,
     swapExercise,
