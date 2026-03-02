@@ -153,6 +153,26 @@ export async function seedDatabase() {
       }
     }
 
+    // V7: Retroactively update secondary rep counts on ALL conj-4 sessions (including completed)
+    if (conjWeek1 && !(conjWeek1 as any)._wsV7) {
+      await db.templates.update(conjWeek1.id, { _wsV7: true } as any);
+      const CONJ_SEC_REPS: Record<number, number> = { 1: 6, 2: 5, 3: 5, 4: 8 };
+      const allConjSessions = await db.sessions
+        .where('blockType').equals('conj-4')
+        .toArray();
+      for (const sess of allConjSessions) {
+        const targetReps = CONJ_SEC_REPS[sess.weekNumber];
+        if (!targetReps) continue;
+        const sessionSets = await db.sets.where('sessionId').equals(sess.id).toArray();
+        const secondarySets = sessionSets.filter((s: any) => s.setType === 'secondary');
+        for (const s of secondarySets) {
+          if (s.goalReps !== targetReps) {
+            await db.sets.update(s.id, { goalReps: targetReps });
+          }
+        }
+      }
+    }
+
     // Migrate: always keep linear-4 (5/3/1) templates in sync with latest data
     const wendlerTemplates = (templateData as any[]).filter((t) => t.blockType === 'linear-4');
     for (const tpl of wendlerTemplates) {
