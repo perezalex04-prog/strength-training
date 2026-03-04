@@ -195,7 +195,7 @@ const CONJ_PRIMARY_EXERCISES: Partial<Record<DayNumber, { name: string; category
   1: { name: 'Competition Bench', category: 'bench-primary' },       // ME Upper
   2: { name: 'Competition Back Squat', category: 'squat-primary' },  // ME Lower
   3: { name: 'Banded Bench', category: 'bench-primary' },            // DE Upper
-  4: { name: 'Banded Box Squat', category: 'squat-secondary' },      // DE Lower
+  4: { name: 'Banded Squat', category: 'squat-primary' },              // DE Lower
 };
 
 const CONJ_DAY_EXERCISE_DEFAULTS: Partial<Record<DayNumber, { secondaries: SlotDef[]; accessories: SlotDef[] }>> = {
