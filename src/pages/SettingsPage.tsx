@@ -116,6 +116,38 @@ export function SettingsPage() {
           </div>
         </Card>
 
+        {/* Equipment */}
+        <Card title="Equipment">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm text-slate-300">Micro Plates (0.5 lb)</span>
+                <p className="text-[10px] text-slate-600">Enables half-pound increments</p>
+              </div>
+              <button
+                onClick={() => updateSettings({ microPlates: !settings.microPlates })}
+                className={`w-12 h-7 rounded-full transition-colors ${
+                  settings.microPlates ? 'bg-amber-600' : 'bg-slate-700'
+                }`}
+              >
+                <div className={`w-5 h-5 bg-white rounded-full transition-transform mx-1 ${
+                  settings.microPlates ? 'translate-x-5' : ''
+                }`} />
+              </button>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-slate-300">Bar Weight</span>
+              <input
+                type="number"
+                value={settings.barWeight}
+                onChange={(e) => handleNumberChange('barWeight', e.target.value)}
+                className="w-20 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-right text-sm text-slate-200 tabular-nums"
+              />
+              <span className="text-xs text-slate-600">lbs</span>
+            </div>
+          </div>
+        </Card>
+
         {/* Data Management */}
         <Card title="Data">
           <div className="space-y-3">

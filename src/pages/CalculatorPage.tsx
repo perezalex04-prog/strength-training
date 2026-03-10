@@ -21,7 +21,7 @@ const PCT_LABELS: Record<number, string> = {
   50: 'Warm-up',
 };
 
-const RPE_OPTIONS = [10, 9.5, 9, 8.5, 8, 7.5, 7, 6.5, 6];
+const RPE_OPTIONS = [10, 9.5, 9, 8.5, 8, 7.5, 7, 6.5, 6, 5.5, 5];
 
 const WARMUP_STEPS = [
   { pct: 0, reps: 10, label: 'Bar' },
@@ -40,7 +40,8 @@ export function CalculatorPage() {
   const [workingWeight, setWorkingWeight] = useState(0);
 
   const barWeight = settings?.barWeight ?? 45;
-  const availPlates = settings?.availablePlates;
+  const basePlates = settings?.availablePlates ?? [45, 35, 25, 10, 5, 2.5];
+  const availPlates = settings?.microPlates ? [...basePlates, 1.25, 0.5] : basePlates;
 
   // RPE calculator result
   const rpeWeight = calculateGoalWeight(oneRM, rpeReps, rpeTarget);

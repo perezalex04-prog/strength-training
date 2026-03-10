@@ -33,6 +33,7 @@ export interface UserSettings {
   availablePlates: number[];
   theme: 'dark' | 'light' | 'system';
   restTimerDefault: number;
+  microPlates?: boolean;
 }
 
 export interface Exercise {

@@ -11,12 +11,14 @@ interface SetGroupProps {
   onUpdate: (setId: string, updates: { actualWeight?: number | null; actualReps?: number | null; actualRPE?: number | null }) => void;
   onSwapExercise?: (setIds: string[], exerciseId: string, exerciseName: string) => void;
   onUpdateNotes?: (setId: string, notes: string) => void;
+  onAddSet?: (templateSetId: string) => void;
+  onShowHistory?: (exerciseId: string, exerciseName: string) => void;
   prevWeekBest?: { weight: number; reps: number; rpe: number; e1rm: number };
   /** Override categories for the exercise picker (e.g. conjugate lower shows squat + deadlift) */
   filterCategories?: ExerciseCategory[];
 }
 
-export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes, prevWeekBest, filterCategories }: SetGroupProps) {
+export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes, onAddSet, onShowHistory, prevWeekBest, filterCategories }: SetGroupProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const notesRef = useRef<HTMLTextAreaElement>(null);
@@ -112,9 +114,12 @@ export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes,
           )}
         </div>
 
-        {/* Performance history: Last session + All-time best */}
+        {/* Performance history: Last session + All-time best (tap for full history) */}
         {pr && pr.lastWeight > 0 && (
-          <div className="px-1 -mt-0.5 space-y-0.5">
+          <button
+            className="px-1 -mt-0.5 space-y-0.5 text-left w-full"
+            onClick={() => onShowHistory?.(exerciseId, exerciseName)}
+          >
             {/* Most recent session */}
             <div>
               <span className="text-[10px] text-slate-500">
@@ -130,7 +135,7 @@ export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes,
                 </span>
               </div>
             )}
-          </div>
+          </button>
         )}
 
         {/* Previous week's top set (only on top sets group) */}
@@ -163,6 +168,16 @@ export function SetGroup({ label, sets, onUpdate, onSwapExercise, onUpdateNotes,
             showExerciseName={isMultiExercise}
           />
         ))}
+
+        {/* Add extra set button */}
+        {onAddSet && (
+          <button
+            onClick={() => onAddSet(sets[sets.length - 1].id)}
+            className="w-full flex items-center justify-center gap-1 py-1.5 text-slate-600 active:text-slate-400 text-xs"
+          >
+            <span>+</span> Add Set
+          </button>
+        )}
       </div>
 
       <ExercisePicker

@@ -4,6 +4,7 @@ import { Header } from '@/components/layout/Header';
 import { SetGroup } from '@/components/workout/SetGroup';
 import { ProgramPreview } from '@/components/workout/ProgramPreview';
 import { RestTimer } from '@/components/workout/RestTimer';
+import { ExerciseHistory } from '@/components/workout/ExerciseHistory';
 import { useSettings } from '@/hooks/useSettings';
 import { useActiveWorkout, type OneRMUpdate } from '@/hooks/useActiveWorkout';
 import { useRestTimer } from '@/hooks/useRestTimer';
@@ -93,6 +94,7 @@ export function WorkoutPage() {
   );
   const [previewOpen, setPreviewOpen] = useState(false);
   const [rmUpdates, setRmUpdates] = useState<OneRMUpdate[]>([]);
+  const [historyExercise, setHistoryExercise] = useState<{ id: string; name: string } | null>(null);
   const dateRef = useRef<HTMLInputElement>(null);
   const initRef = useRef<Set<number>>(new Set());
 
@@ -276,6 +278,8 @@ export function WorkoutPage() {
               onUpdate={workout.updateSet}
               onSwapExercise={workout.swapExercise}
               onUpdateNotes={workout.updateNotes}
+              onAddSet={!session?.completed ? workout.addSet : undefined}
+              onShowHistory={(exId, exName) => setHistoryExercise({ id: exId, name: exName })}
               prevWeekBest={group.key === 'top' ? workout.prevWeekBests[activeDay] : undefined}
               filterCategories={overrideCategories}
             />
@@ -341,6 +345,15 @@ export function WorkoutPage() {
         onStop={timer.stop}
         defaultSeconds={settings.restTimerDefault}
       />
+
+      {historyExercise && (
+        <ExerciseHistory
+          exerciseId={historyExercise.id}
+          exerciseName={historyExercise.name}
+          isOpen={!!historyExercise}
+          onClose={() => setHistoryExercise(null)}
+        />
+      )}
     </div>
   );
 }

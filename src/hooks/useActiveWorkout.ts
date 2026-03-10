@@ -196,6 +196,31 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     await db.sets.update(setId, { notes });
   }
 
+  /** Add an extra set that copies the last set in a group */
+  async function addSet(templateSetId: string): Promise<void> {
+    const templateSet = await db.sets.get(templateSetId);
+    if (!templateSet) return;
+
+    // Find the highest set number in this session to generate a unique ID
+    const sessionSets = await db.sets.where('sessionId').equals(templateSet.sessionId).toArray();
+    const maxSetNum = Math.max(...sessionSets.map((s) => s.setNumber));
+
+    const newSet: WorkoutSet = {
+      ...templateSet,
+      id: `${templateSet.sessionId}-set-${maxSetNum + 1}`,
+      setNumber: maxSetNum + 1,
+      actualWeight: null,
+      actualReps: null,
+      actualRPE: null,
+      e1rm: null,
+      percentOfTM: null,
+      tonnage: null,
+      notes: undefined,
+    };
+
+    await db.sets.add(newSet);
+  }
+
   async function swapExercise(setIds: string[], exerciseId: string, exerciseName: string) {
     await Promise.all(
       setIds.map((id) => db.sets.update(id, { exerciseId, exerciseName })),
@@ -436,6 +461,7 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     recalculateGoalWeights,
     updateSet,
     updateNotes,
+    addSet,
     swapExercise,
     completeSession,
     getSetsForDay,
