@@ -25,14 +25,16 @@ export function calculateGoalWeight(
   trainingMax: number,
   targetReps: number,
   targetRPE: number,
+  microPlates: boolean = false,
 ): number {
   const effectiveReps = targetReps + (10 - targetRPE);
   const raw = trainingMax * (37 - effectiveReps) / 36;
-  return roundTo5(raw);
+  return roundTo5(raw, microPlates);
 }
 
-export function roundTo5(value: number): number {
-  return Math.round(value / 5) * 5;
+export function roundTo5(value: number, microPlates: boolean = false): number {
+  const increment = microPlates ? 1 : 5;
+  return Math.round(value / increment) * increment;
 }
 
 export function calculatePercentOfTM(weight: number, trainingMax: number): string {

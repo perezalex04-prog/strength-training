@@ -260,6 +260,7 @@ export async function generateWorkoutSets(
   isVolume: boolean,
   oneRM: number,
   trainingMaxPercent: number,
+  microPlates: boolean = false,
 ): Promise<Omit<WorkoutSet, 'id' | 'sessionId'>[]> {
   const template = await db.templates.where({ blockType, weekNumber }).first();
   if (!template) return [];
@@ -293,11 +294,11 @@ export async function generateWorkoutSets(
     // === 5/3/1 (WENDLER) — percentage-based ramping sets ===
     let wendlerTM = trainingMax;
     // Day 4 (OHP) uses bench 1RM with reduced multiplier
-    if (dayNumber === 4) wendlerTM = roundTo5(trainingMax * OHP_TM_MULTIPLIER);
+    if (dayNumber === 4) wendlerTM = roundTo5(trainingMax * OHP_TM_MULTIPLIER, microPlates);
 
     const wendlerSets = WENDLER_SETS[weekNumber] ?? WENDLER_SETS[1];
     for (const ws of wendlerSets) {
-      const goalWeight = roundTo5(wendlerTM * ws.percent);
+      const goalWeight = roundTo5(wendlerTM * ws.percent, microPlates);
       sets.push(makeSet({
         exerciseId: primary.id, exerciseName: primary.name, setType: 'top',
         setNumber: ++setNum, goalWeight,
@@ -307,7 +308,7 @@ export async function generateWorkoutSets(
 
     // BBB supplemental: 5×10 at 55% of TM (skip on deload week)
     if (weekNumber !== 4 && template.backoffSets > 0) {
-      const bbbWeight = roundTo5(wendlerTM * BBB_PERCENT);
+      const bbbWeight = roundTo5(wendlerTM * BBB_PERCENT, microPlates);
       for (let i = 0; i < template.backoffSets; i++) {
         sets.push(makeSet({
           exerciseId: primary.id, exerciseName: primary.name, setType: 'backoff',
@@ -336,8 +337,8 @@ export async function generateWorkoutSets(
       }
 
       const vTopWeight = vTopPercent
-        ? roundTo5(trainingMax * vTopPercent * fatigueMult)
-        : roundTo5(calculateGoalWeight(trainingMax, vTopReps, vTopRPE) * fatigueMult);
+        ? roundTo5(trainingMax * vTopPercent * fatigueMult, microPlates)
+        : roundTo5(calculateGoalWeight(trainingMax, vTopReps, vTopRPE, microPlates) * fatigueMult, microPlates);
       for (let i = 0; i < vTopSets; i++) {
         sets.push(makeSet({
           exerciseId: primary.id, exerciseName: primary.name, setType: 'top',
@@ -352,7 +353,7 @@ export async function generateWorkoutSets(
       const volReps = template.volumeBackoffReps ?? template.backoffReps;
       const volRPE = template.volumeBackoffRPE ?? template.backoffRPE;
       const volSets = template.volumeBackoffSets ?? 4;
-      const volWeight = roundTo5(calculateGoalWeight(trainingMax, volReps, volRPE) * fatigueMult);
+      const volWeight = roundTo5(calculateGoalWeight(trainingMax, volReps, volRPE, microPlates) * fatigueMult, microPlates);
       for (let i = 0; i < volSets; i++) {
         sets.push(makeSet({
           exerciseId: primary.id, exerciseName: primary.name, setType: 'volume',
@@ -362,7 +363,7 @@ export async function generateWorkoutSets(
       }
     }
   } else {
-    const topGoalWeight = roundTo5(calculateGoalWeight(trainingMax, template.topReps, template.topRPE) * fatigueMult);
+    const topGoalWeight = roundTo5(calculateGoalWeight(trainingMax, template.topReps, template.topRPE, microPlates) * fatigueMult, microPlates);
     for (let i = 0; i < template.topSets; i++) {
       sets.push(makeSet({
         exerciseId: primary.id, exerciseName: primary.name, setType: 'top',
@@ -373,7 +374,7 @@ export async function generateWorkoutSets(
 
     // Backoff sets (skip entirely when template prescribes 0, e.g. conjugate ME days)
     if (template.backoffSets > 0) {
-      const backoffGoalWeight = roundTo5(calculateGoalWeight(trainingMax, template.backoffReps, template.backoffRPE) * fatigueMult);
+      const backoffGoalWeight = roundTo5(calculateGoalWeight(trainingMax, template.backoffReps, template.backoffRPE, microPlates) * fatigueMult, microPlates);
 
       // Volume-adjusted backoff set count (clamped to at least 1)
       const adjustedBackoffSets = Math.max(1, template.backoffSets + volumeAdj);
@@ -400,7 +401,7 @@ export async function generateWorkoutSets(
       if (settings) {
         const deadliftTM = Math.round(settings.deadlift1RM * settings.trainingMaxPercent);
         const pullCfg = CONJ_SPEED_PULL[weekNumber] ?? CONJ_SPEED_PULL[1];
-        const pullWeight = roundTo5(deadliftTM * pullCfg.percent);
+        const pullWeight = roundTo5(deadliftTM * pullCfg.percent, microPlates);
         for (let i = 0; i < pullCfg.sets; i++) {
           sets.push(makeSet({
             exerciseId: exercise.id, exerciseName: exercise.name, setType: 'secondary',

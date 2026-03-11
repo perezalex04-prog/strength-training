@@ -44,7 +44,7 @@ export function CalculatorPage() {
   const availPlates = settings?.microPlates ? [...basePlates, 1.25, 0.5] : basePlates;
 
   // RPE calculator result
-  const rpeWeight = calculateGoalWeight(oneRM, rpeReps, rpeTarget);
+  const rpeWeight = calculateGoalWeight(oneRM, rpeReps, rpeTarget, !!settings?.microPlates);
   const rpePlates = calculatePlates(rpeWeight, barWeight, availPlates);
 
   return (
@@ -159,7 +159,7 @@ export function CalculatorPage() {
                 {WARMUP_STEPS.map((step) => {
                   const weight = step.pct === 0
                     ? barWeight
-                    : roundTo5(workingWeight * step.pct / 100);
+                    : roundTo5(workingWeight * step.pct / 100, !!settings?.microPlates);
                   // Skip warmup step if weight would be at or below bar weight (except the bar step itself)
                   if (step.pct > 0 && weight <= barWeight) return null;
                   const plates = calculatePlates(weight, barWeight, availPlates);
@@ -208,7 +208,7 @@ export function CalculatorPage() {
               <span className="text-right">Use</span>
             </div>
             {PERCENTAGES.map((pct) => {
-              const weight = roundTo5(oneRM * pct / 100);
+              const weight = roundTo5(oneRM * pct / 100, !!settings?.microPlates);
               const plates = calculatePlates(weight, barWeight, availPlates);
               return (
                 <div key={pct} className="grid grid-cols-4 gap-2 items-center">
