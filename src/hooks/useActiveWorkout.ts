@@ -126,7 +126,6 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
       day.isVolume,
       oneRM,
       settings.trainingMaxPercent,
-      !!settings.microPlates,
     );
 
     const setsWithIds: WorkoutSet[] = goalSets.map((s, i) => ({
@@ -181,7 +180,6 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
             merged.actualRPE,
             template.backoffReps,
             template.backoffRPE,
-            !!settings.microPlates,
           );
 
           await Promise.all(
@@ -280,17 +278,16 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     const dayConfig = getDayConfigForBlock(settings.currentBlockType).find((d) => d.dayNumber === session.dayNumber);
     const fatigueMult = 1.0; // Don't re-query fatigue on swap
 
-    const mp = !!settings.microPlates;
     for (const s of primarySets) {
       let newWeight: number;
       if (s.setType === 'top' && dayConfig?.isVolume && template.volumeTopPercent) {
-        newWeight = roundTo5(trainingMax * template.volumeTopPercent * fatigueMult, mp);
+        newWeight = roundTo5(trainingMax * template.volumeTopPercent * fatigueMult);
       } else if (s.setType === 'top') {
-        newWeight = roundTo5(calculateGoalWeight(trainingMax, s.goalReps, s.goalRPE, mp), mp);
+        newWeight = roundTo5(calculateGoalWeight(trainingMax, s.goalReps, s.goalRPE));
       } else if (s.setType === 'backoff') {
-        newWeight = roundTo5(calculateGoalWeight(trainingMax, s.goalReps, s.goalRPE, mp), mp);
+        newWeight = roundTo5(calculateGoalWeight(trainingMax, s.goalReps, s.goalRPE));
       } else {
-        newWeight = roundTo5(calculateGoalWeight(trainingMax, s.goalReps, s.goalRPE, mp), mp);
+        newWeight = roundTo5(calculateGoalWeight(trainingMax, s.goalReps, s.goalRPE));
       }
       if (s.actualWeight == null) {
         await db.sets.update(s.id, { goalWeight: newWeight });
@@ -397,7 +394,7 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
         (set.setType === 'top' || set.setType === 'backoff') &&
         set.goalRPE > 0
       ) {
-        const newGoalWeight = calculateGoalWeight(liveTM, set.goalReps, set.goalRPE, !!settings.microPlates);
+        const newGoalWeight = calculateGoalWeight(liveTM, set.goalReps, set.goalRPE);
         if (newGoalWeight !== set.goalWeight) {
           updates.push({ id: set.id, goalWeight: newGoalWeight });
         }

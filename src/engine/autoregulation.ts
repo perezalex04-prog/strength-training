@@ -26,13 +26,12 @@ export function calculateAutoregulatedBackoff(
   actualTopRPE: number,
   targetBackoffReps: number,
   targetBackoffRPE: number,
-  microPlates: boolean = false,
 ): number {
   const actualE1RM = calculateE1RM(actualTopWeight, actualTopReps, actualTopRPE);
-  if (!actualE1RM) return roundTo5(actualTopWeight * 0.9, microPlates);
+  if (!actualE1RM) return roundTo5(actualTopWeight * 0.9);
 
   // Use the actual e1RM as a live training max to calculate backoff
-  return calculateGoalWeight(actualE1RM, targetBackoffReps, targetBackoffRPE, microPlates);
+  return calculateGoalWeight(actualE1RM, targetBackoffReps, targetBackoffRPE);
 }
 
 /**
