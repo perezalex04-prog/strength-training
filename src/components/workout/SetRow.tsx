@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { clsx } from 'clsx';
 import type { WorkoutSet, SetType } from '@/db/types';
+import { useSettings } from '@/hooks/useSettings';
 import { NumberPad } from './NumberPad';
 import { RPESelector } from './RPESelector';
 
@@ -29,6 +30,7 @@ const setTypeLabels: Record<SetType, string> = {
 };
 
 export function SetRow({ set, onUpdate, showExerciseName = false }: SetRowProps) {
+  const { settings } = useSettings();
   const [editField, setEditField] = useState<'weight' | 'reps' | 'rpe' | null>(null);
 
   const isComplete = set.actualWeight != null && set.actualReps != null && set.actualRPE != null;
@@ -108,6 +110,7 @@ export function SetRow({ set, onUpdate, showExerciseName = false }: SetRowProps)
         initialValue={set.actualWeight ?? set.goalWeight}
         mode="weight"
         label={`${set.exerciseName} — Weight`}
+        microPlates={!!settings?.microPlates}
       />
       <NumberPad
         isOpen={editField === 'reps'}

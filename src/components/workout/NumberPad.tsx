@@ -8,9 +8,10 @@ interface NumberPadProps {
   initialValue?: number;
   mode: 'weight' | 'reps';
   label?: string;
+  microPlates?: boolean;
 }
 
-export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, label }: NumberPadProps) {
+export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, label, microPlates }: NumberPadProps) {
   const [value, setValue] = useState('');
 
   useEffect(() => {
@@ -23,9 +24,16 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
 
   const handleDigit = (d: string) => {
     setValue((prev) => {
+      // Decimal point: only allow one, only in weight mode with micro plates
+      if (d === '.') {
+        if (!microPlates || mode !== 'weight' || prev.includes('.')) return prev;
+        return prev === '' ? '0.' : prev + '.';
+      }
       const next = prev + d;
       if (mode === 'weight' && Number(next) > 1500) return prev;
       if (mode === 'reps' && Number(next) > 99) return prev;
+      // Limit to 1 decimal place for weights
+      if (prev.includes('.') && prev.split('.')[1].length >= 1) return prev;
       return next;
     });
   };
@@ -35,7 +43,13 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
   const handleConfirm = () => {
     const num = Number(value);
     if (num > 0) {
-      onConfirm(mode === 'weight' ? Math.round(num / 2.5) * 2.5 : num);
+      if (mode === 'weight') {
+        // With micro plates: round to nearest 0.5 lb. Without: round to nearest 2.5 lb.
+        const step = microPlates ? 0.5 : 2.5;
+        onConfirm(Math.round(num / step) * step);
+      } else {
+        onConfirm(num);
+      }
     }
     onClose();
   };
@@ -43,10 +57,12 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
   const handleIncrement = (delta: number) => {
     const current = Number(value) || 0;
     const next = Math.max(0, current + delta);
-    setValue(String(next));
+    // Clean display: avoid floating point artifacts like 80.50000000001
+    setValue(String(Math.round(next * 10) / 10));
   };
 
   const quickReps = [1, 2, 3, 4, 5, 6, 8, 10, 12, 15];
+  const increments = microPlates ? [-5, -0.5, 0.5, 5] : [-10, -5, 5, 10];
 
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-black/60" onClick={onClose}>
@@ -66,7 +82,7 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
         {/* Quick increment buttons for weight */}
         {mode === 'weight' && (
           <div className="flex gap-2 px-4 pb-2">
-            {[-10, -5, 5, 10].map((delta) => (
+            {increments.map((delta) => (
               <button
                 key={delta}
                 onClick={() => handleIncrement(delta)}
@@ -110,10 +126,10 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
             </button>
           ))}
           <button
-            onClick={handleDelete}
+            onClick={microPlates && mode === 'weight' ? () => handleDigit('.') : handleDelete}
             className="py-4 rounded-lg bg-slate-800 text-slate-400 text-xl active:bg-slate-700"
           >
-            ⌫
+            {microPlates && mode === 'weight' ? '.' : '\u232B'}
           </button>
           <button
             onClick={() => handleDigit('0')}
@@ -125,15 +141,23 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
             onClick={handleConfirm}
             className="py-4 rounded-lg bg-amber-600 text-white text-xl font-bold active:bg-amber-700"
           >
-            ✓
+            {'\u2713'}
           </button>
         </div>
 
-        {/* Cancel */}
-        <div className="px-4 pb-4">
+        {/* Delete + Cancel row */}
+        <div className="flex gap-2 px-4 pb-4">
+          {microPlates && mode === 'weight' && (
+            <button
+              onClick={handleDelete}
+              className="flex-1 py-3 rounded-lg text-slate-400 text-sm bg-slate-800 active:bg-slate-700"
+            >
+              {'\u232B'} Delete
+            </button>
+          )}
           <button
             onClick={onClose}
-            className="w-full py-3 rounded-lg text-slate-400 text-sm"
+            className="flex-1 py-3 rounded-lg text-slate-400 text-sm"
           >
             Cancel
           </button>
