@@ -24,9 +24,8 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
 
   const handleDigit = (d: string) => {
     setValue((prev) => {
-      // Decimal point: only allow one, only in weight mode with micro plates
       if (d === '.') {
-        if (!microPlates || mode !== 'weight' || prev.includes('.')) return prev;
+        if (prev.includes('.')) return prev;
         return prev === '' ? '0.' : prev + '.';
       }
       const next = prev + d;
@@ -44,7 +43,6 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
     const num = Number(value);
     if (num > 0) {
       if (mode === 'weight') {
-        // With micro plates: round to nearest 0.5 lb. Without: round to nearest 2.5 lb.
         const step = microPlates ? 0.5 : 2.5;
         onConfirm(Math.round(num / step) * step);
       } else {
@@ -57,7 +55,6 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
   const handleIncrement = (delta: number) => {
     const current = Number(value) || 0;
     const next = Math.max(0, current + delta);
-    // Clean display: avoid floating point artifacts like 80.50000000001
     setValue(String(Math.round(next * 10) / 10));
   };
 
@@ -96,6 +93,14 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
                 {delta > 0 ? '+' : ''}{delta}
               </button>
             ))}
+            {microPlates && (
+              <button
+                onClick={() => handleDigit('.')}
+                className="w-12 py-2.5 rounded-lg text-sm font-semibold bg-slate-700 text-slate-300 active:bg-slate-600"
+              >
+                .
+              </button>
+            )}
           </div>
         )}
 
@@ -126,10 +131,10 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
             </button>
           ))}
           <button
-            onClick={microPlates && mode === 'weight' ? () => handleDigit('.') : handleDelete}
+            onClick={handleDelete}
             className="py-4 rounded-lg bg-slate-800 text-slate-400 text-xl active:bg-slate-700"
           >
-            {microPlates && mode === 'weight' ? '.' : '\u232B'}
+            {'\u232B'}
           </button>
           <button
             onClick={() => handleDigit('0')}
@@ -145,19 +150,11 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
           </button>
         </div>
 
-        {/* Delete + Cancel row */}
-        <div className="flex gap-2 px-4 pb-4">
-          {microPlates && mode === 'weight' && (
-            <button
-              onClick={handleDelete}
-              className="flex-1 py-3 rounded-lg text-slate-400 text-sm bg-slate-800 active:bg-slate-700"
-            >
-              {'\u232B'} Delete
-            </button>
-          )}
+        {/* Cancel */}
+        <div className="px-4 pb-4">
           <button
             onClick={onClose}
-            className="flex-1 py-3 rounded-lg text-slate-400 text-sm"
+            className="w-full py-3 rounded-lg text-slate-400 text-sm"
           >
             Cancel
           </button>
