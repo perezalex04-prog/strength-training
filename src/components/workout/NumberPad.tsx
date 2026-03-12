@@ -59,7 +59,7 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
   };
 
   const quickReps = [1, 2, 3, 4, 5, 6, 8, 10, 12, 15];
-  const increments = microPlates ? [-5, -0.5, 0.5, 5] : [-10, -5, 5, 10];
+  const increments = [-10, -5, 5, 10];
 
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-black/60" onClick={onClose}>

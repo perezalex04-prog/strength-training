@@ -36,13 +36,16 @@ export function ExerciseHistory({ exerciseId, exerciseName, isOpen, onClose }: E
       );
 
       // Build date-grouped entries sorted by most recent first
-      const entries: { date: string; sets: { weight: number; reps: number; rpe: number | null; e1rm: number | null; setType: string }[] }[] = [];
+      const entries: { date: string; notes: string | null; sets: { weight: number; reps: number; rpe: number | null; e1rm: number | null; setType: string }[] }[] = [];
       for (let i = 0; i < sessionIds.length; i++) {
         const sess = sessions[i];
         if (!sess) continue;
         const sessionSets = bySession.get(sessionIds[i])!;
+        // Grab notes from any set in this group (notes are stored per exercise group)
+        const notes = sessionSets.find((s) => s.notes)?.notes ?? null;
         entries.push({
           date: sess.date,
+          notes,
           sets: sessionSets
             .sort((a, b) => a.setNumber - b.setNumber)
             .map((s) => ({
@@ -88,7 +91,7 @@ export function ExerciseHistory({ exerciseId, exerciseName, isOpen, onClose }: E
                 <div key={i} className="flex items-center gap-3 text-xs text-slate-300 pl-2">
                   <span className="text-[10px] text-slate-600 w-6 uppercase">{s.setType.slice(0, 3)}</span>
                   <span className="font-semibold tabular-nums">
-                    {s.weight}×{s.reps}
+                    {s.weight}x{s.reps}
                     {s.rpe != null && <span className="text-slate-500"> @{s.rpe}</span>}
                   </span>
                   {s.e1rm != null && (
@@ -96,6 +99,9 @@ export function ExerciseHistory({ exerciseId, exerciseName, isOpen, onClose }: E
                   )}
                 </div>
               ))}
+              {entry.notes && (
+                <div className="pl-2 text-[11px] text-amber-500/80 italic">{entry.notes}</div>
+              )}
             </div>
           ))}
         </div>

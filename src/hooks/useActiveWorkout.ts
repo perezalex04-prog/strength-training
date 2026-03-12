@@ -334,16 +334,16 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     );
 
     // === AUTO 1RM UPDATES ===
+    // Only check the lift trained in THIS session, not all lifts across the week
     const rmUpdates: OneRMUpdate[] = [];
-    for (const lift of lifts) {
-      const best = liftBests[lift];
-      if (!best?.actualWeight || !best?.actualReps || !best?.actualRPE) continue;
-
-      const current1RM = settings[`${lift}1RM` as keyof UserSettings] as number;
+    const sessionLift = session.primaryLift;
+    const best = liftBests[sessionLift];
+    if (best?.actualWeight && best?.actualReps && best?.actualRPE) {
+      const current1RM = settings[`${sessionLift}1RM` as keyof UserSettings] as number;
       const newRM = checkForNewPR(best.actualWeight, best.actualReps, best.actualRPE, current1RM);
       if (newRM) {
-        await db.settings.update('user', { [`${lift}1RM`]: newRM });
-        rmUpdates.push({ lift, old: current1RM, new: newRM });
+        await db.settings.update('user', { [`${sessionLift}1RM`]: newRM });
+        rmUpdates.push({ lift: sessionLift, old: current1RM, new: newRM });
       }
     }
 
