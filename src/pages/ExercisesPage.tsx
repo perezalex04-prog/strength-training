@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { clsx } from 'clsx';
 import { db } from '@/db/database';
@@ -27,6 +27,89 @@ const CATEGORY_LABELS: Record<ExerciseCategory, string> = {
 };
 
 const ALL_CATEGORIES = Object.keys(CATEGORY_LABELS) as ExerciseCategory[];
+
+function AddExerciseModal({
+  newName, setNewName, newCategory, setNewCategory, onSave, onClose,
+}: {
+  newName: string;
+  setNewName: (v: string) => void;
+  newCategory: ExerciseCategory;
+  setNewCategory: (v: ExerciseCategory) => void;
+  onSave: () => void;
+  onClose: () => void;
+}) {
+  const [vpHeight, setVpHeight] = useState<number | null>(null);
+
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => setVpHeight(vv.height);
+    update();
+    vv.addEventListener('resize', update);
+    return () => vv.removeEventListener('resize', update);
+  }, []);
+
+  return (
+    <div
+      className="fixed inset-x-0 top-0 z-50 flex flex-col justify-end bg-black/60"
+      style={{ height: vpHeight ? `${vpHeight}px` : '100dvh' }}
+      onClick={onClose}
+    >
+      <div
+        className="w-full bg-slate-900 border-t border-slate-700 rounded-t-xl safe-bottom p-4 space-y-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="text-lg font-semibold text-slate-200">Add Exercise</h3>
+
+        <div>
+          <label className="text-xs text-slate-500 block mb-1">Exercise Name</label>
+          <input
+            type="text"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            placeholder="e.g., Seated Cable Row"
+            autoFocus
+            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600"
+          />
+        </div>
+
+        <div>
+          <label className="text-xs text-slate-500 block mb-1">Category</label>
+          <select
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value as ExerciseCategory)}
+            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-200"
+          >
+            {ALL_CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>{CATEGORY_LABELS[cat]}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex gap-3 pt-2">
+          <button
+            onClick={onClose}
+            className="flex-1 py-3 rounded-lg bg-slate-800 text-slate-400 text-sm font-semibold"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onSave}
+            disabled={!newName.trim()}
+            className={clsx(
+              'flex-1 py-3 rounded-lg text-sm font-semibold',
+              newName.trim()
+                ? 'bg-amber-600 text-white active:bg-amber-700'
+                : 'bg-slate-700 text-slate-500',
+            )}
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function ExercisesPage() {
   const [search, setSearch] = useState('');
@@ -147,60 +230,14 @@ export function ExercisesPage() {
 
       {/* Add Exercise Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-end bg-black/60" onClick={() => setShowAddModal(false)}>
-          <div
-            className="w-full bg-slate-900 border-t border-slate-700 rounded-t-xl safe-bottom p-4 space-y-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-lg font-semibold text-slate-200">Add Exercise</h3>
-
-            <div>
-              <label className="text-xs text-slate-500 block mb-1">Exercise Name</label>
-              <input
-                type="text"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder="e.g., Seated Cable Row"
-                autoFocus
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs text-slate-500 block mb-1">Category</label>
-              <select
-                value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value as ExerciseCategory)}
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-200"
-              >
-                {ALL_CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>{CATEGORY_LABELS[cat]}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="flex-1 py-3 rounded-lg bg-slate-800 text-slate-400 text-sm font-semibold"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddExercise}
-                disabled={!newName.trim()}
-                className={clsx(
-                  'flex-1 py-3 rounded-lg text-sm font-semibold',
-                  newName.trim()
-                    ? 'bg-amber-600 text-white active:bg-amber-700'
-                    : 'bg-slate-700 text-slate-500',
-                )}
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
+        <AddExerciseModal
+          newName={newName}
+          setNewName={setNewName}
+          newCategory={newCategory}
+          setNewCategory={setNewCategory}
+          onSave={handleAddExercise}
+          onClose={() => setShowAddModal(false)}
+        />
       )}
     </div>
   );
