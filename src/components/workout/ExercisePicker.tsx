@@ -55,6 +55,7 @@ export function ExercisePicker({ isOpen, onClose, onSelect, category, filterCate
   const [search, setSearch] = useState('');
   const [viewportHeight, setViewportHeight] = useState<number | null>(null);
   const [showCreateCategory, setShowCreateCategory] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Track visual viewport height for iOS keyboard handling
@@ -100,6 +101,12 @@ export function ExercisePicker({ isOpen, onClose, onSelect, category, filterCate
     onClose();
     setSearch('');
     setShowCreateCategory(false);
+    setConfirmDelete(null);
+  };
+
+  const handleDelete = async (exerciseId: string) => {
+    await db.exercises.delete(exerciseId);
+    setConfirmDelete(null);
   };
 
   const handleCreate = async (cat: ExerciseCategory) => {
@@ -199,18 +206,47 @@ export function ExercisePicker({ isOpen, onClose, onSelect, category, filterCate
                     {group.label}
                   </span>
                 </div>
-                {group.exercises.map((exercise) => (
-                  <button
-                    key={exercise.id}
-                    onClick={() => {
-                      onSelect(exercise.id, exercise.name);
-                      handleClose();
-                    }}
-                    className="w-full text-left px-3 py-2.5 border-b border-slate-800/50 active:bg-slate-800 transition-colors"
-                  >
-                    <div className="text-sm text-slate-200">{exercise.name}</div>
-                  </button>
-                ))}
+                {group.exercises.map((exercise) => {
+                  const isCustom = exercise.id.startsWith('custom-');
+                  return (
+                    <div key={exercise.id} className="flex items-center border-b border-slate-800/50">
+                      <button
+                        onClick={() => {
+                          if (confirmDelete === exercise.id) return;
+                          onSelect(exercise.id, exercise.name);
+                          handleClose();
+                        }}
+                        className="flex-1 text-left px-3 py-2.5 active:bg-slate-800 transition-colors"
+                      >
+                        <div className="text-sm text-slate-200">{exercise.name}</div>
+                      </button>
+                      {isCustom && confirmDelete !== exercise.id && (
+                        <button
+                          onClick={() => setConfirmDelete(exercise.id)}
+                          className="px-3 py-2.5 text-slate-600 active:text-red-400 text-xs"
+                        >
+                          Delete
+                        </button>
+                      )}
+                      {confirmDelete === exercise.id && (
+                        <div className="flex items-center gap-1 px-2">
+                          <button
+                            onClick={() => handleDelete(exercise.id)}
+                            className="px-2 py-1 rounded bg-red-500/20 text-red-400 text-xs font-semibold active:bg-red-500/30"
+                          >
+                            Confirm
+                          </button>
+                          <button
+                            onClick={() => setConfirmDelete(null)}
+                            className="px-2 py-1 text-slate-500 text-xs"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             ))}
           </>
