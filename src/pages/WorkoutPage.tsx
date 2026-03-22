@@ -95,6 +95,7 @@ export function WorkoutPage() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [rmUpdates, setRmUpdates] = useState<OneRMUpdate[]>([]);
   const [historyExercise, setHistoryExercise] = useState<{ id: string; name: string } | null>(null);
+  const [confirmCompleteBlock, setConfirmCompleteBlock] = useState(false);
   const dateRef = useRef<HTMLInputElement>(null);
   const initRef = useRef<Set<number>>(new Set());
 
@@ -146,8 +147,10 @@ export function WorkoutPage() {
           onChange={(e) => {
             const newBlock = e.target.value as BlockType;
             const maxWeek = BLOCK_MAX_WEEKS[newBlock];
-            const updates: { currentBlockType: BlockType; currentWeek?: number } = { currentBlockType: newBlock };
+            const updates: { currentBlockType: BlockType; currentWeek?: number; blockCycle?: number } = { currentBlockType: newBlock };
             if (settings.currentWeek > maxWeek) updates.currentWeek = 1;
+            // Reset cycle when switching programs
+            if (newBlock !== settings.currentBlockType) updates.blockCycle = 1;
             // Clamp activeDay if new block has fewer days
             const newDays = getDayConfigForBlock(newBlock);
             if (activeDay > newDays.length) setActiveDay(1);
@@ -174,7 +177,10 @@ export function WorkoutPage() {
           ))}
         </select>
 
-        <span className="text-xs text-slate-500 font-medium">{session?.phase ?? '...'}</span>
+        <span className="text-xs text-slate-500 font-medium">
+          {session?.phase ?? '...'}
+          {(settings.blockCycle ?? 1) > 1 && <span className="text-slate-600"> · C{settings.blockCycle}</span>}
+        </span>
         <button
           onClick={() => setPreviewOpen(true)}
           className="text-slate-500 text-[10px] font-bold tracking-wider uppercase px-2 py-1 rounded bg-slate-800 active:bg-slate-700 border border-slate-700"
@@ -319,6 +325,53 @@ export function WorkoutPage() {
             )}
           </div>
         )}
+
+        {/* Complete Block — resets to week 1 with fresh exercise slots */}
+        {settings.currentWeek === BLOCK_MAX_WEEKS[settings.currentBlockType] && (
+          <div className="border border-slate-700 rounded-lg p-4 space-y-3">
+            <div className="text-center">
+              <span className="text-sm text-slate-400">
+                {BLOCK_LABELS[settings.currentBlockType]} — Cycle {settings.blockCycle ?? 1}
+              </span>
+              <p className="text-xs text-slate-600 mt-1">
+                Finished this block? Start a new cycle with fresh exercise slots.
+              </p>
+            </div>
+            {!confirmCompleteBlock ? (
+              <button
+                onClick={() => setConfirmCompleteBlock(true)}
+                className="w-full py-3 bg-slate-800 border border-amber-500/30 text-amber-400 font-semibold rounded-lg text-sm uppercase tracking-wide active:bg-slate-700"
+              >
+                Complete Block & Start New Cycle
+              </button>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-xs text-center text-slate-400">
+                  This will reset to Week 1 with new exercise slots. All history is kept.
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setConfirmCompleteBlock(false)}
+                    className="flex-1 py-3 rounded-lg bg-slate-800 text-slate-400 text-sm font-semibold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={async () => {
+                      initRef.current.clear();
+                      await workout.completeBlock();
+                      setConfirmCompleteBlock(false);
+                      setActiveDay(1);
+                    }}
+                    className="flex-1 py-3 rounded-lg bg-amber-600 text-white text-sm font-semibold active:bg-amber-700"
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <ProgramPreview
@@ -328,8 +381,9 @@ export function WorkoutPage() {
         currentWeek={settings.currentWeek}
         onSwitchProgram={(blockType) => {
           const maxWeek = BLOCK_MAX_WEEKS[blockType];
-          const updates: { currentBlockType: BlockType; currentWeek?: number } = { currentBlockType: blockType };
+          const updates: { currentBlockType: BlockType; currentWeek?: number; blockCycle?: number } = { currentBlockType: blockType };
           if (settings.currentWeek > maxWeek) updates.currentWeek = 1;
+          if (blockType !== settings.currentBlockType) updates.blockCycle = 1;
           const newDays = getDayConfigForBlock(blockType);
           if (activeDay > newDays.length) setActiveDay(1);
           initRef.current.clear();

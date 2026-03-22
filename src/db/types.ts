@@ -29,6 +29,8 @@ export interface UserSettings {
   trainingMaxPercent: number;
   currentBlockType: BlockType;
   currentWeek: number;
+  /** Cycle counter — incremented each time the user completes a block and resets to week 1 */
+  blockCycle: number;
   barWeight: number;
   availablePlates: number[];
   theme: 'dark' | 'light' | 'system';
@@ -75,6 +77,8 @@ export interface WorkoutSession {
   date: string;
   blockType: BlockType;
   weekNumber: number;
+  /** Which cycle of this block (increments on "Complete Block") */
+  blockCycle: number;
   phase: Phase;
   dayNumber: DayNumber;
   primaryLift: PrimaryLift;

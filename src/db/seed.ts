@@ -14,6 +14,7 @@ const DEFAULT_SETTINGS: UserSettings = {
   trainingMaxPercent: 1.0,
   currentBlockType: 'linear-8',
   currentWeek: 2,
+  blockCycle: 1,
   barWeight: 45,
   availablePlates: [45, 35, 25, 10, 5, 2.5],
   theme: 'dark',
@@ -24,6 +25,12 @@ export async function seedDatabase() {
   const settingsCount = await db.settings.count();
   if (settingsCount === 0) {
     await db.settings.put(DEFAULT_SETTINGS);
+  } else {
+    // Backfill blockCycle for existing users
+    const existing = await db.settings.get('singleton');
+    if (existing && (existing as any).blockCycle == null) {
+      await db.settings.update('singleton', { blockCycle: 1 });
+    }
   }
 
   const exerciseCount = await db.exercises.count();

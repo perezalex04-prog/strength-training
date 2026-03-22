@@ -22,12 +22,13 @@ async function getPrevWeekBestE1RM(
   weekNumber: number,
   dayNumber: DayNumber,
   primaryLift: PrimaryLift,
+  blockCycle: number,
 ): Promise<number | null> {
   if (weekNumber <= 1) return null;
 
   const prevWeek = weekNumber - 1;
   const prevSessions = await db.sessions
-    .where({ blockType, weekNumber: prevWeek })
+    .where({ blockType, weekNumber: prevWeek, blockCycle })
     .filter((s) => s.dayNumber === dayNumber && s.primaryLift === primaryLift && s.completed)
     .toArray();
 
@@ -62,14 +63,16 @@ async function getPrevWeekBestE1RM(
 export function useActiveWorkout(settings: UserSettings | undefined, selectedDate?: string) {
   const today = selectedDate ?? new Date().toISOString().split('T')[0];
 
+  const blockCycle = settings?.blockCycle ?? 1;
+
   const sessions = useLiveQuery(
     async () => {
       if (!settings) return [];
       return db.sessions
-        .where({ blockType: settings.currentBlockType, weekNumber: settings.currentWeek })
+        .where({ blockType: settings.currentBlockType, weekNumber: settings.currentWeek, blockCycle })
         .toArray();
     },
-    [settings?.currentBlockType, settings?.currentWeek],
+    [settings?.currentBlockType, settings?.currentWeek, blockCycle],
   );
 
   const allSets = useLiveQuery(
@@ -88,13 +91,13 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     const day = getDayConfigForBlock(settings.currentBlockType).find((d) => d.dayNumber === dayNumber)!;
 
     // Check IndexedDB DIRECTLY — not the stale React sessions array
-    const sessionId = `session-${settings.currentBlockType}-w${settings.currentWeek}-d${dayNumber}-${sessionDate}`;
+    const sessionId = `session-${settings.currentBlockType}-c${blockCycle}-w${settings.currentWeek}-d${dayNumber}-${sessionDate}`;
     const existingById = await db.sessions.get(sessionId);
     if (existingById) return existingById;
 
-    // Also check if ANY session exists for this day in this block/week (different date)
+    // Also check if ANY session exists for this day in this block/week/cycle (different date)
     const existingByDay = await db.sessions
-      .where({ blockType: settings.currentBlockType, weekNumber: settings.currentWeek })
+      .where({ blockType: settings.currentBlockType, weekNumber: settings.currentWeek, blockCycle })
       .filter((s) => s.dayNumber === dayNumber)
       .first();
     if (existingByDay) return existingByDay;
@@ -109,6 +112,7 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
       date: sessionDate,
       blockType: settings.currentBlockType,
       weekNumber: settings.currentWeek,
+      blockCycle,
       phase: template?.phase ?? 'accumulation',
       dayNumber,
       primaryLift: day.primaryLift,
@@ -303,9 +307,9 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     await updateExercisePRs(sets, session.date);
     await db.sessions.update(sessionId, { completed: true });
 
-    // Build progression snapshot from ALL sessions in this block/week
+    // Build progression snapshot from ALL sessions in this block/week/cycle
     const weekSessions = await db.sessions
-      .where({ blockType: settings.currentBlockType, weekNumber: settings.currentWeek })
+      .where({ blockType: settings.currentBlockType, weekNumber: settings.currentWeek, blockCycle })
       .toArray();
     const weekSessionIds = weekSessions.map((s) => s.id);
     const allWeekSets = await db.sets.where('sessionId').anyOf(weekSessionIds).toArray();
@@ -381,6 +385,7 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
       session.weekNumber,
       session.dayNumber,
       session.primaryLift,
+      blockCycle,
     );
 
     // Use the higher of prev week e1RM and current settings TM
@@ -415,7 +420,7 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
       if (!settings || settings.currentWeek <= 1) return {};
       const prevWeek = settings.currentWeek - 1;
       const prevSessions = await db.sessions
-        .where({ blockType: settings.currentBlockType, weekNumber: prevWeek })
+        .where({ blockType: settings.currentBlockType, weekNumber: prevWeek, blockCycle })
         .toArray();
       if (prevSessions.length === 0) return {};
 
@@ -444,6 +449,16 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     [settings?.currentBlockType, settings?.currentWeek],
   );
 
+  /** Complete the current block: increment cycle counter and reset to week 1.
+   *  All history (sessions, sets, PRs) is preserved — new cycle gets fresh sessions. */
+  async function completeBlock(): Promise<void> {
+    if (!settings) return;
+    await db.settings.update('singleton', {
+      currentWeek: 1,
+      blockCycle: blockCycle + 1,
+    });
+  }
+
   function getSetsForDay(dayNumber: DayNumber): WorkoutSet[] {
     if (!sessions || !allSets) return [];
     const session = sessions.find((s) => s.dayNumber === dayNumber);
@@ -464,6 +479,7 @@ export function useActiveWorkout(settings: UserSettings | undefined, selectedDat
     addSet,
     swapExercise,
     completeSession,
+    completeBlock,
     getSetsForDay,
     findBestSet,
   };

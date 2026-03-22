@@ -29,6 +29,15 @@ export class StrengthDB extends Dexie {
       progression: 'id, date, weekNumber',
       exercisePRs: 'id, exerciseId, exerciseName',
     });
+    // V2: Add blockCycle to sessions compound index
+    this.version(2).stores({
+      sessions: 'id, date, [blockType+weekNumber], [blockType+weekNumber+blockCycle], dayNumber, completed',
+    }).upgrade((tx) => {
+      // Backfill blockCycle=1 on all existing sessions
+      return tx.table('sessions').toCollection().modify((session) => {
+        if (session.blockCycle == null) session.blockCycle = 1;
+      });
+    });
   }
 }
 
