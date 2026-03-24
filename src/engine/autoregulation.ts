@@ -31,7 +31,11 @@ export function calculateAutoregulatedBackoff(
   if (!actualE1RM) return roundTo5(actualTopWeight * 0.9);
 
   // Use the actual e1RM as a live training max to calculate backoff
-  return calculateGoalWeight(actualE1RM, targetBackoffReps, targetBackoffRPE);
+  const raw = calculateGoalWeight(actualE1RM, targetBackoffReps, targetBackoffRPE);
+
+  // Backoffs must never exceed the actual top set weight — cap and drop at least 5%
+  const cap = roundTo5(actualTopWeight * 0.95);
+  return Math.min(raw, cap);
 }
 
 /**
