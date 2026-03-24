@@ -244,55 +244,93 @@ const CONJ_DAY_EXERCISE_DEFAULTS: Partial<Record<DayNumber, { secondaries: SlotD
   },
 };
 
-// === Calgary Barbell 16-Week exercise maps ===
-const CALGARY_PRIMARY_EXERCISES: Partial<Record<DayNumber, { name: string; category: ExerciseCategory }>> = {
-  1: { name: 'Competition Back Squat', category: 'squat-primary' },
-  2: { name: 'Competition Bench', category: 'bench-primary' },
-  3: { name: 'Competition Back Squat', category: 'squat-primary' },  // volume day
-  4: { name: 'Competition Deadlift', category: 'deadlift-primary' },
+// === Calgary Barbell 16-Week ===
+// Percentage-based loading config matching Bryce Krawczyk's programming
+// D1: Squat + Bench (intensity), D2: Deadlift + Bench (secondary), D3: Variation, D4: Volume/Tempo
+interface CBBWeekConfig {
+  phase: string;
+  // D1/D2 main competition lifts (% of TM) — RPE-only when percent is null
+  main: { sets: number; reps: number; percent: number | null; rpe?: number };
+  backoff: { sets: number; reps: number; percent: number } | null;
+  // D3 variation day
+  variation: { sets: number; reps: number; percent: number };
+  // D4 tempo/volume day
+  tempo: { sets: number; reps: number; percent: number };
+  tngBench: { sets: number; reps: number; percent: number } | null;
+  // Accessory volume (shrinks through phases)
+  secondarySets: number;
+  accessorySets: number;
+}
+
+const CBB_CONFIG: Record<number, CBBWeekConfig> = {
+  // Phase 1 — Accumulation (Weeks 1-4): Straight sets, no backoffs
+  1:  { phase: 'accumulation', main: { sets: 4, reps: 7, percent: 0.64 }, backoff: null, variation: { sets: 3, reps: 6, percent: 0.62 }, tempo: { sets: 3, reps: 6, percent: 0.60 }, tngBench: { sets: 4, reps: 10, percent: 0.60 }, secondarySets: 3, accessorySets: 3 },
+  2:  { phase: 'accumulation', main: { sets: 4, reps: 6, percent: 0.67 }, backoff: null, variation: { sets: 3, reps: 6, percent: 0.63 }, tempo: { sets: 3, reps: 6, percent: 0.62 }, tngBench: { sets: 4, reps: 8,  percent: 0.62 }, secondarySets: 3, accessorySets: 3 },
+  3:  { phase: 'accumulation', main: { sets: 4, reps: 6, percent: 0.69 }, backoff: null, variation: { sets: 3, reps: 6, percent: 0.64 }, tempo: { sets: 3, reps: 6, percent: 0.63 }, tngBench: { sets: 4, reps: 8,  percent: 0.64 }, secondarySets: 3, accessorySets: 3 },
+  4:  { phase: 'accumulation', main: { sets: 5, reps: 5, percent: 0.71 }, backoff: null, variation: { sets: 3, reps: 5, percent: 0.66 }, tempo: { sets: 3, reps: 5, percent: 0.65 }, tngBench: { sets: 4, reps: 6,  percent: 0.66 }, secondarySets: 3, accessorySets: 3 },
+  // Phase 2 — Intensity (Weeks 5-8): Top sets + backoff sets
+  5:  { phase: 'transmutation', main: { sets: 3, reps: 3, percent: 0.76 }, backoff: { sets: 2, reps: 5, percent: 0.65 }, variation: { sets: 3, reps: 4, percent: 0.68 }, tempo: { sets: 3, reps: 4, percent: 0.65 }, tngBench: { sets: 3, reps: 8, percent: 0.62 }, secondarySets: 3, accessorySets: 3 },
+  6:  { phase: 'transmutation', main: { sets: 4, reps: 3, percent: 0.78 }, backoff: { sets: 2, reps: 5, percent: 0.67 }, variation: { sets: 4, reps: 4, percent: 0.70 }, tempo: { sets: 3, reps: 4, percent: 0.67 }, tngBench: { sets: 3, reps: 6, percent: 0.65 }, secondarySets: 3, accessorySets: 3 },
+  7:  { phase: 'transmutation', main: { sets: 4, reps: 2, percent: 0.81 }, backoff: { sets: 2, reps: 5, percent: 0.69 }, variation: { sets: 4, reps: 3, percent: 0.72 }, tempo: { sets: 3, reps: 3, percent: 0.69 }, tngBench: { sets: 3, reps: 6, percent: 0.67 }, secondarySets: 3, accessorySets: 3 },
+  8:  { phase: 'transmutation', main: { sets: 4, reps: 3, percent: 0.85 }, backoff: { sets: 3, reps: 4, percent: 0.75 }, variation: { sets: 3, reps: 3, percent: 0.74 }, tempo: { sets: 3, reps: 3, percent: 0.71 }, tngBench: { sets: 3, reps: 6, percent: 0.69 }, secondarySets: 3, accessorySets: 3 },
+  // Phase 3 — Competition Prep (Weeks 9-11): Increasing specificity
+  9:  { phase: 'comp prep', main: { sets: 5, reps: 4, percent: 0.78 }, backoff: { sets: 2, reps: 4, percent: 0.67 }, variation: { sets: 3, reps: 4, percent: 0.70 }, tempo: { sets: 3, reps: 4, percent: 0.67 }, tngBench: { sets: 3, reps: 6, percent: 0.65 }, secondarySets: 3, accessorySets: 2 },
+  10: { phase: 'comp prep', main: { sets: 6, reps: 4, percent: 0.81 }, backoff: { sets: 2, reps: 4, percent: 0.69 }, variation: { sets: 3, reps: 3, percent: 0.73 }, tempo: { sets: 3, reps: 3, percent: 0.70 }, tngBench: { sets: 3, reps: 5, percent: 0.67 }, secondarySets: 3, accessorySets: 2 },
+  11: { phase: 'comp prep', main: { sets: 1, reps: 1, percent: null, rpe: 8.0 }, backoff: { sets: 3, reps: 3, percent: 0.83 }, variation: { sets: 2, reps: 3, percent: 0.75 }, tempo: { sets: 2, reps: 3, percent: 0.72 }, tngBench: { sets: 2, reps: 5, percent: 0.67 }, secondarySets: 3, accessorySets: 2 },
+  // Phase 4 — Peaking/Taper (Weeks 12-16): RPE singles + decreasing backoff volume
+  12: { phase: 'peak', main: { sets: 1, reps: 3, percent: null, rpe: 8.0 }, backoff: { sets: 6, reps: 5, percent: 0.63 }, variation: { sets: 2, reps: 3, percent: 0.68 }, tempo: { sets: 2, reps: 3, percent: 0.65 }, tngBench: { sets: 2, reps: 6, percent: 0.60 }, secondarySets: 2, accessorySets: 2 },
+  13: { phase: 'peak', main: { sets: 1, reps: 2, percent: null, rpe: 8.0 }, backoff: { sets: 4, reps: 4, percent: 0.65 }, variation: { sets: 2, reps: 2, percent: 0.70 }, tempo: { sets: 2, reps: 2, percent: 0.67 }, tngBench: { sets: 2, reps: 5, percent: 0.62 }, secondarySets: 2, accessorySets: 2 },
+  14: { phase: 'taper', main: { sets: 1, reps: 1, percent: null, rpe: 8.0 }, backoff: { sets: 3, reps: 3, percent: 0.70 }, variation: { sets: 0, reps: 0, percent: 0 }, tempo: { sets: 0, reps: 0, percent: 0 }, tngBench: null, secondarySets: 2, accessorySets: 1 },
+  15: { phase: 'taper', main: { sets: 1, reps: 1, percent: null, rpe: 9.0 }, backoff: { sets: 3, reps: 2, percent: 0.80 }, variation: { sets: 0, reps: 0, percent: 0 }, tempo: { sets: 0, reps: 0, percent: 0 }, tngBench: null, secondarySets: 1, accessorySets: 0 },
+  16: { phase: 'meet week', main: { sets: 1, reps: 1, percent: null, rpe: 10.0 }, backoff: { sets: 2, reps: 2, percent: 0.78 }, variation: { sets: 0, reps: 0, percent: 0 }, tempo: { sets: 0, reps: 0, percent: 0 }, tngBench: null, secondarySets: 0, accessorySets: 0 },
 };
 
-const CALGARY_DAY_EXERCISE_DEFAULTS: Partial<Record<DayNumber, { secondaries: SlotDef[]; accessories: SlotDef[] }>> = {
-  1: { // Squat day — bench secondary + posterior chain
+// CBB exercise slots per day (matching Bryce's real template)
+const CBB_DAY_EXERCISES: Record<number, {
+  primary: { name: string; category: ExerciseCategory };
+  benchSlot: { name: string; category: ExerciseCategory } | null; // heavy bench on D1, secondary bench on D2
+  secondaries: SlotDef[];
+  accessories: SlotDef[];
+}> = {
+  1: { // D1: Competition Squat + Competition Bench (paused) — OHP, Bent Over Row, Back Extension
+    primary: { name: 'Competition Back Squat', category: 'squat-primary' },
+    benchSlot: { name: 'Competition Bench', category: 'bench-primary' },
     secondaries: [
-      { name: 'Close Grip Bench', category: 'bench-secondary' },
+      { name: 'Overhead Press', category: 'shoulders-press' },
       { name: 'Barbell Row', category: 'horizontal-row' },
     ],
     accessories: [
-      { name: 'Leg Press', category: 'quad-accessory' },
-      { name: 'Nordic Curl', category: 'posterior-chain' },
-      { name: 'Ab Wheel', category: 'core' },
+      { name: 'Back Extension', category: 'posterior-chain' },
     ],
   },
-  2: { // Bench day — upper body
-    secondaries: [
-      { name: 'Incline Bench', category: 'bench-secondary' },
-      { name: 'Weighted Pull-up', category: 'vertical-pull' },
-    ],
-    accessories: [
-      { name: 'Tricep Pushdown (rope)', category: 'triceps' },
-      { name: 'Face Pull', category: 'shoulders-isolation' },
-      { name: 'Spider Curl', category: 'biceps' },
-    ],
-  },
-  3: { // Volume squat day — front squat secondary + legs
+  2: { // D2: Competition Deadlift + Bench (lighter) — Front Squat, Cable Row
+    primary: { name: 'Competition Deadlift', category: 'deadlift-primary' },
+    benchSlot: { name: 'Competition Bench', category: 'bench-primary' },
     secondaries: [
       { name: 'Front Squat', category: 'squat-secondary' },
+      { name: 'Cable Row', category: 'horizontal-row' },
+    ],
+    accessories: [],
+  },
+  3: { // D3: Pin Squat/Box Squat + Bench variation (Spoto/Board) — DB Row, Core
+    primary: { name: 'Pin Squat', category: 'squat-secondary' },
+    benchSlot: { name: 'Spoto Press', category: 'bench-secondary' },
+    secondaries: [
+      { name: 'DB Row', category: 'horizontal-row' },
     ],
     accessories: [
-      { name: 'Leg Press', category: 'quad-accessory' },
-      { name: 'GHR', category: 'posterior-chain' },
-      { name: 'Ab Wheel', category: 'core' },
+      { name: 'Bird Dog', category: 'core' },
     ],
   },
-  4: { // Deadlift day — posterior chain focus
+  4: { // D4: 2ct Pause Deadlift + TnG Bench (volume) — SLDL, Lat Pulldown, Skull Crushers
+    primary: { name: 'Pause Deadlift', category: 'deadlift-secondary' },
+    benchSlot: null, // TnG bench handled separately in generator
     secondaries: [
-      { name: 'Block Pull (2")', category: 'deadlift-secondary' },
+      { name: 'Stiff Leg Deadlift', category: 'posterior-chain' },
+      { name: 'Lat Pulldown', category: 'vertical-pull' },
     ],
     accessories: [
-      { name: 'Reverse Hyper', category: 'posterior-chain' },
-      { name: 'GHR', category: 'posterior-chain' },
-      { name: 'Ab Wheel', category: 'core' },
+      { name: 'Skull Crushers', category: 'triceps' },
     ],
   },
 };
@@ -455,6 +493,212 @@ const RTS_DAY_EXERCISE_DEFAULTS: Partial<Record<DayNumber, { secondaries: SlotDe
   },
 };
 
+/**
+ * Calgary Barbell 16-Week generator — percentage-based programming faithful to Bryce Krawczyk's template.
+ * Each day has its own loading scheme: D1/D2 are competition intensity, D3 is variation, D4 is tempo/volume.
+ * Bench appears on EVERY day (4x/wk frequency) — heavy on D1, secondary on D2, variation on D3, TnG on D4.
+ */
+async function generateCBBSets(
+  weekNumber: number,
+  dayNumber: DayNumber,
+): Promise<Omit<WorkoutSet, 'id' | 'sessionId'>[]> {
+  const cfg = CBB_CONFIG[weekNumber] ?? CBB_CONFIG[1];
+  const dayEx = CBB_DAY_EXERCISES[dayNumber];
+  if (!dayEx) return [];
+
+  const settings = await db.settings.get('singleton');
+  if (!settings) return [];
+
+  const sets: Omit<WorkoutSet, 'id' | 'sessionId'>[] = [];
+  let setNum = 0;
+
+  // Determine training maxes
+  const sqTM = Math.round(settings.squat1RM * settings.trainingMaxPercent);
+  const bnTM = Math.round(settings.bench1RM * settings.trainingMaxPercent);
+  const dlTM = Math.round(settings.deadlift1RM * settings.trainingMaxPercent);
+
+  const primary = await findExercise(dayEx.primary.name, dayEx.primary.category);
+  const primaryTM = dayEx.primary.category.startsWith('squat') ? sqTM
+    : dayEx.primary.category.startsWith('deadlift') ? dlTM
+    : dayEx.primary.category.startsWith('bench') ? bnTM
+    : sqTM;
+
+  // === PRIMARY LIFT ===
+  if (dayNumber === 1 || dayNumber === 2) {
+    // D1/D2: Competition lifts — use main config
+    const mainCfg = cfg.main;
+    const topWeight = mainCfg.percent
+      ? roundTo5(primaryTM * mainCfg.percent)
+      : roundTo5(calculateGoalWeight(primaryTM, mainCfg.reps, mainCfg.rpe ?? 8.0));
+    for (let i = 0; i < mainCfg.sets; i++) {
+      sets.push(makeSet({
+        exerciseId: primary.id, exerciseName: primary.name, setType: 'top',
+        setNumber: ++setNum, goalWeight: topWeight,
+        goalReps: mainCfg.reps, goalRPE: mainCfg.rpe ?? 0, category: dayEx.primary.category,
+      }));
+    }
+    // Backoff sets
+    if (cfg.backoff) {
+      const boWeight = roundTo5(primaryTM * cfg.backoff.percent);
+      for (let i = 0; i < cfg.backoff.sets; i++) {
+        sets.push(makeSet({
+          exerciseId: primary.id, exerciseName: primary.name, setType: 'backoff',
+          setNumber: ++setNum, goalWeight: boWeight,
+          goalReps: cfg.backoff.reps, goalRPE: 0, category: dayEx.primary.category,
+        }));
+      }
+    }
+  } else if (dayNumber === 3) {
+    // D3: Variation day — squat variation
+    if (cfg.variation.sets > 0) {
+      const varWeight = roundTo5(sqTM * cfg.variation.percent);
+      for (let i = 0; i < cfg.variation.sets; i++) {
+        sets.push(makeSet({
+          exerciseId: primary.id, exerciseName: primary.name, setType: 'top',
+          setNumber: ++setNum, goalWeight: varWeight,
+          goalReps: cfg.variation.reps, goalRPE: 0, category: dayEx.primary.category,
+        }));
+      }
+    }
+  } else if (dayNumber === 4) {
+    // D4: Tempo deadlift — 2ct pause deadlift
+    if (cfg.tempo.sets > 0) {
+      const tempoWeight = roundTo5(dlTM * cfg.tempo.percent);
+      for (let i = 0; i < cfg.tempo.sets; i++) {
+        sets.push(makeSet({
+          exerciseId: primary.id, exerciseName: primary.name, setType: 'top',
+          setNumber: ++setNum, goalWeight: tempoWeight,
+          goalReps: cfg.tempo.reps, goalRPE: 0, category: dayEx.primary.category,
+        }));
+      }
+    }
+  }
+
+  // === BENCH SLOT (appears on every day except D4 TnG which is separate) ===
+  if (dayEx.benchSlot) {
+    const bench = await findExercise(dayEx.benchSlot.name, dayEx.benchSlot.category);
+
+    if (dayNumber === 1) {
+      // D1: Bench uses SAME main config percentages but with bench TM
+      const mainCfg = cfg.main;
+      const benchWeight = mainCfg.percent
+        ? roundTo5(bnTM * mainCfg.percent)
+        : roundTo5(calculateGoalWeight(bnTM, mainCfg.reps, mainCfg.rpe ?? 8.0));
+      for (let i = 0; i < mainCfg.sets; i++) {
+        sets.push(makeSet({
+          exerciseId: bench.id, exerciseName: bench.name, setType: 'secondary',
+          setNumber: ++setNum, goalWeight: benchWeight,
+          goalReps: mainCfg.reps, goalRPE: mainCfg.rpe ?? 0, category: dayEx.benchSlot.category,
+        }));
+      }
+      // Bench backoffs on D1
+      if (cfg.backoff) {
+        const benchBo = roundTo5(bnTM * cfg.backoff.percent);
+        for (let i = 0; i < cfg.backoff.sets; i++) {
+          sets.push(makeSet({
+            exerciseId: bench.id, exerciseName: bench.name, setType: 'secondary',
+            setNumber: ++setNum, goalWeight: benchBo,
+            goalReps: cfg.backoff.reps, goalRPE: 0, category: dayEx.benchSlot.category,
+          }));
+        }
+      }
+    } else if (dayNumber === 2) {
+      // D2: Bench is lighter secondary — use ~90% of main bench percentages
+      const mainCfg = cfg.main;
+      const d2Percent = mainCfg.percent ? mainCfg.percent * 0.90 : null;
+      const d2Weight = d2Percent
+        ? roundTo5(bnTM * d2Percent)
+        : roundTo5(calculateGoalWeight(bnTM, mainCfg.reps + 1, (mainCfg.rpe ?? 8.0) - 1.0));
+      const d2Sets = Math.max(2, mainCfg.sets - 1);
+      for (let i = 0; i < d2Sets; i++) {
+        sets.push(makeSet({
+          exerciseId: bench.id, exerciseName: bench.name, setType: 'secondary',
+          setNumber: ++setNum, goalWeight: d2Weight,
+          goalReps: mainCfg.reps, goalRPE: 0, category: dayEx.benchSlot.category,
+        }));
+      }
+    } else if (dayNumber === 3) {
+      // D3: Bench variation — uses variation config percentages with bench TM
+      if (cfg.variation.sets > 0) {
+        const varBenchWeight = roundTo5(bnTM * cfg.variation.percent);
+        for (let i = 0; i < cfg.variation.sets; i++) {
+          sets.push(makeSet({
+            exerciseId: bench.id, exerciseName: bench.name, setType: 'secondary',
+            setNumber: ++setNum, goalWeight: varBenchWeight,
+            goalReps: cfg.variation.reps, goalRPE: 0, category: dayEx.benchSlot.category,
+          }));
+        }
+      }
+    }
+  }
+
+  // D4: TnG Bench — separate from benchSlot, uses tngBench config
+  if (dayNumber === 4 && cfg.tngBench) {
+    const tng = await findExercise('Touch and Go Bench', 'bench-primary');
+    const tngWeight = roundTo5(bnTM * cfg.tngBench.percent);
+    for (let i = 0; i < cfg.tngBench.sets; i++) {
+      sets.push(makeSet({
+        exerciseId: tng.id, exerciseName: tng.name, setType: 'secondary',
+        setNumber: ++setNum, goalWeight: tngWeight,
+        goalReps: cfg.tngBench.reps, goalRPE: 0, category: 'bench-primary',
+      }));
+    }
+  }
+
+  // === SECONDARIES (RPE-based, auto-weight from PR history) ===
+  if (cfg.secondarySets > 0) {
+    const template = await db.templates.where({ blockType: 'calgary-16' as BlockType, weekNumber }).first();
+    const secReps = template?.secondaryReps ?? 8;
+    const secRPE = template?.secondaryRPE ?? 8.0;
+    for (const sec of dayEx.secondaries) {
+      const exercise = await findExercise(sec.name, sec.category);
+      const lastWeight = await getLastWeight(exercise.id);
+      for (let i = 0; i < cfg.secondarySets; i++) {
+        sets.push(makeSet({
+          exerciseId: exercise.id, exerciseName: exercise.name, setType: 'secondary',
+          setNumber: ++setNum, goalWeight: lastWeight,
+          goalReps: secReps, goalRPE: secRPE, category: sec.category,
+        }));
+      }
+    }
+  }
+
+  // === ACCESSORIES (RPE-based, auto-weight from PR history) ===
+  if (cfg.accessorySets > 0) {
+    const template = await db.templates.where({ blockType: 'calgary-16' as BlockType, weekNumber }).first();
+    const accReps = template?.accessoryReps ?? 10;
+    const accRPE = template?.accessoryRPE ?? 8.0;
+    for (const acc of dayEx.accessories) {
+      const exercise = await findExercise(acc.name, acc.category);
+      const lastWeight = await getLastWeight(exercise.id);
+      for (let i = 0; i < cfg.accessorySets; i++) {
+        sets.push(makeSet({
+          exerciseId: exercise.id, exerciseName: exercise.name, setType: 'accessory',
+          setNumber: ++setNum, goalWeight: lastWeight,
+          goalReps: accReps, goalRPE: accRPE, category: acc.category,
+        }));
+      }
+    }
+  }
+
+  // === OPTIONAL SLOTS ===
+  const template = await db.templates.where({ blockType: 'calgary-16' as BlockType, weekNumber }).first();
+  const optReps = template?.accessoryReps ?? 10;
+  const optRPE = template?.accessoryRPE ?? 8.0;
+  for (let slot = 0; slot < 3; slot++) {
+    const optSets = cfg.accessorySets > 0 ? cfg.accessorySets : 1;
+    for (let i = 0; i < optSets; i++) {
+      sets.push(makeSet({
+        exerciseId: '', exerciseName: `(Optional ${slot + 1})`, setType: 'optional',
+        setNumber: ++setNum, goalWeight: 0,
+        goalReps: optReps, goalRPE: optRPE, category: null,
+      }));
+    }
+  }
+
+  return sets;
+}
+
 async function findExercise(name: string, category: ExerciseCategory) {
   const found = await db.exercises.where('name').equals(name).first();
   if (found) return { id: found.id, name: found.name };
@@ -472,6 +716,11 @@ export async function generateWorkoutSets(
   oneRM: number,
   trainingMaxPercent: number,
 ): Promise<Omit<WorkoutSet, 'id' | 'sessionId'>[]> {
+  // Calgary Barbell has its own fully custom generator (percentage-based, multi-lift days)
+  if (blockType === 'calgary-16') {
+    return generateCBBSets(weekNumber, dayNumber);
+  }
+
   const template = await db.templates.where({ blockType, weekNumber }).first();
   if (!template) return [];
 
@@ -483,7 +732,6 @@ export async function generateWorkoutSets(
     blockType === 'conj-4' ? CONJ_PRIMARY_EXERCISES[dayNumber] :
     blockType === 'linear-4' ? WENDLER_PRIMARY_EXERCISES[dayNumber] :
     blockType === 'texas-4' ? TEXAS_PRIMARY_EXERCISES[dayNumber] :
-    blockType === 'calgary-16' ? CALGARY_PRIMARY_EXERCISES[dayNumber] :
     blockType === 'sheiko-4' ? SHEIKO_PRIMARY_EXERCISES[dayNumber] :
     blockType === 'gzcl-4' ? GZCL_PRIMARY_EXERCISES[dayNumber] :
     blockType === 'rts-4' ? RTS_PRIMARY_EXERCISES[dayNumber] :
@@ -494,7 +742,6 @@ export async function generateWorkoutSets(
     blockType === 'conj-4' ? CONJ_DAY_EXERCISE_DEFAULTS[dayNumber] :
     blockType === 'linear-4' ? WENDLER_DAY_EXERCISE_DEFAULTS[dayNumber] :
     blockType === 'texas-4' ? TEXAS_DAY_EXERCISE_DEFAULTS[dayNumber] :
-    blockType === 'calgary-16' ? CALGARY_DAY_EXERCISE_DEFAULTS[dayNumber] :
     blockType === 'sheiko-4' ? SHEIKO_DAY_EXERCISE_DEFAULTS[dayNumber] :
     blockType === 'gzcl-4' ? GZCL_DAY_EXERCISE_DEFAULTS[dayNumber] :
     blockType === 'rts-4' ? RTS_DAY_EXERCISE_DEFAULTS[dayNumber] :

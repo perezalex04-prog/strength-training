@@ -1,6 +1,6 @@
 export type BlockType = 'linear-6' | 'linear-8' | 'linear-4' | 'dup-6' | 'wave-6' | 'conj-4' | 'peak-8' | 'texas-4' | 'block-12' | 'calgary-16' | 'sheiko-4' | 'gzcl-4' | 'rts-4';
 
-export type Phase = 'accumulation' | 'transmutation' | 'realization' | 'deload';
+export type Phase = 'accumulation' | 'transmutation' | 'realization' | 'deload' | 'comp prep' | 'peak' | 'taper' | 'meet week';
 
 export type SetType = 'top' | 'backoff' | 'volume' | 'secondary' | 'accessory' | 'optional';
 
@@ -185,6 +185,10 @@ export const PHASE_LABELS: Record<Phase, string> = {
   transmutation: 'Transmutation',
   realization: 'Realization',
   deload: 'Deload',
+  'comp prep': 'Comp Prep',
+  peak: 'Peak',
+  taper: 'Taper',
+  'meet week': 'Meet Week',
 };
 
 export const LIFT_LABELS: Record<PrimaryLift, string> = {
@@ -230,10 +234,10 @@ const TEXAS_DAY_CONFIG: DayConfig[] = [
 ];
 
 const CALGARY_DAY_CONFIG: DayConfig[] = [
-  { dayNumber: 1, label: 'Day 1 — Squat', shortLabel: 'D1 Squat', primaryLift: 'squat', isVolume: false },
-  { dayNumber: 2, label: 'Day 2 — Bench', shortLabel: 'D2 Bench', primaryLift: 'bench', isVolume: false },
-  { dayNumber: 3, label: 'Day 3 — Squat Vol', shortLabel: 'D3 SQ Vol', primaryLift: 'squat', isVolume: true },
-  { dayNumber: 4, label: 'Day 4 — Deadlift', shortLabel: 'D4 Dead', primaryLift: 'deadlift', isVolume: false },
+  { dayNumber: 1, label: 'Day 1 — SQ/BN', shortLabel: 'D1 SQ/BN', primaryLift: 'squat', isVolume: false },
+  { dayNumber: 2, label: 'Day 2 — DL/BN', shortLabel: 'D2 DL/BN', primaryLift: 'deadlift', isVolume: false },
+  { dayNumber: 3, label: 'Day 3 — Variation', shortLabel: 'D3 Var', primaryLift: 'squat', isVolume: false },
+  { dayNumber: 4, label: 'Day 4 — Volume', shortLabel: 'D4 Vol', primaryLift: 'deadlift', isVolume: false },
 ];
 
 const SHEIKO_DAY_CONFIG: DayConfig[] = [

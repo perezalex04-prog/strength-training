@@ -228,5 +228,26 @@ export async function seedDatabase() {
         await db.sessions.bulkDelete(staleIds);
       }
     }
+
+    // CBB V1: Rewrite Calgary Barbell sessions — now percentage-based with real day structure
+    const cbbWeek1 = await db.templates.where({ blockType: 'calgary-16', weekNumber: 1 }).first();
+    if (cbbWeek1 && !(cbbWeek1 as any)._cbbV1) {
+      await db.templates.update(cbbWeek1.id, { _cbbV1: true } as any);
+      // Update all CBB templates with new data
+      const cbbTemplates = (templateData as any[]).filter((t) => t.blockType === 'calgary-16');
+      for (const tpl of cbbTemplates) {
+        await db.templates.put(tpl);
+      }
+      // Clear stale uncompleted CBB sessions so they regenerate
+      const staleSessions = await db.sessions
+        .where('blockType').equals('calgary-16')
+        .filter((s: any) => !s.completed)
+        .toArray();
+      if (staleSessions.length > 0) {
+        const staleIds = staleSessions.map((s: any) => s.id);
+        await db.sets.where('sessionId').anyOf(staleIds).delete();
+        await db.sessions.bulkDelete(staleIds);
+      }
+    }
   }
 }
