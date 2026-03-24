@@ -244,6 +244,217 @@ const CONJ_DAY_EXERCISE_DEFAULTS: Partial<Record<DayNumber, { secondaries: SlotD
   },
 };
 
+// === Calgary Barbell 16-Week exercise maps ===
+const CALGARY_PRIMARY_EXERCISES: Partial<Record<DayNumber, { name: string; category: ExerciseCategory }>> = {
+  1: { name: 'Competition Back Squat', category: 'squat-primary' },
+  2: { name: 'Competition Bench', category: 'bench-primary' },
+  3: { name: 'Competition Back Squat', category: 'squat-primary' },  // volume day
+  4: { name: 'Competition Deadlift', category: 'deadlift-primary' },
+};
+
+const CALGARY_DAY_EXERCISE_DEFAULTS: Partial<Record<DayNumber, { secondaries: SlotDef[]; accessories: SlotDef[] }>> = {
+  1: { // Squat day — bench secondary + posterior chain
+    secondaries: [
+      { name: 'Close Grip Bench', category: 'bench-secondary' },
+      { name: 'Barbell Row', category: 'horizontal-row' },
+    ],
+    accessories: [
+      { name: 'Leg Press', category: 'quad-accessory' },
+      { name: 'Nordic Curl', category: 'posterior-chain' },
+      { name: 'Ab Wheel', category: 'core' },
+    ],
+  },
+  2: { // Bench day — upper body
+    secondaries: [
+      { name: 'Incline Bench', category: 'bench-secondary' },
+      { name: 'Weighted Pull-up', category: 'vertical-pull' },
+    ],
+    accessories: [
+      { name: 'Tricep Pushdown (rope)', category: 'triceps' },
+      { name: 'Face Pull', category: 'shoulders-isolation' },
+      { name: 'Spider Curl', category: 'biceps' },
+    ],
+  },
+  3: { // Volume squat day — front squat secondary + legs
+    secondaries: [
+      { name: 'Front Squat', category: 'squat-secondary' },
+    ],
+    accessories: [
+      { name: 'Leg Press', category: 'quad-accessory' },
+      { name: 'GHR', category: 'posterior-chain' },
+      { name: 'Ab Wheel', category: 'core' },
+    ],
+  },
+  4: { // Deadlift day — posterior chain focus
+    secondaries: [
+      { name: 'Block Pull (2")', category: 'deadlift-secondary' },
+    ],
+    accessories: [
+      { name: 'Reverse Hyper', category: 'posterior-chain' },
+      { name: 'GHR', category: 'posterior-chain' },
+      { name: 'Ab Wheel', category: 'core' },
+    ],
+  },
+};
+
+// === Sheiko 4-Week Mesocycle exercise maps ===
+const SHEIKO_PRIMARY_EXERCISES: Partial<Record<DayNumber, { name: string; category: ExerciseCategory }>> = {
+  1: { name: 'Competition Back Squat', category: 'squat-primary' },
+  2: { name: 'Competition Bench', category: 'bench-primary' },
+  3: { name: 'Competition Back Squat', category: 'squat-primary' },
+  4: { name: 'Competition Deadlift', category: 'deadlift-primary' },
+};
+
+const SHEIKO_DAY_EXERCISE_DEFAULTS: Partial<Record<DayNumber, { secondaries: SlotDef[]; accessories: SlotDef[] }>> = {
+  1: { // Squat + bench
+    secondaries: [
+      { name: 'Competition Bench', category: 'bench-primary' },
+      { name: 'Pause Squat', category: 'squat-secondary' },
+    ],
+    accessories: [
+      { name: 'GHR', category: 'posterior-chain' },
+      { name: 'Ab Wheel', category: 'core' },
+    ],
+  },
+  2: { // Bench + deadlift
+    secondaries: [
+      { name: 'Close Grip Bench', category: 'bench-secondary' },
+      { name: 'Deficit Deadlift (1")', category: 'deadlift-secondary' },
+    ],
+    accessories: [
+      { name: 'Tricep Pushdown (rope)', category: 'triceps' },
+      { name: 'Face Pull', category: 'shoulders-isolation' },
+    ],
+  },
+  3: { // Squat + bench (volume)
+    secondaries: [
+      { name: 'Competition Bench', category: 'bench-primary' },
+      { name: 'Front Squat', category: 'squat-secondary' },
+    ],
+    accessories: [
+      { name: 'Leg Press', category: 'quad-accessory' },
+      { name: 'Nordic Curl', category: 'posterior-chain' },
+    ],
+  },
+  4: { // Deadlift + bench (volume)
+    secondaries: [
+      { name: 'Floor Press', category: 'bench-secondary' },
+      { name: 'Block Pull (2")', category: 'deadlift-secondary' },
+    ],
+    accessories: [
+      { name: 'Reverse Hyper', category: 'posterior-chain' },
+      { name: 'Barbell Row', category: 'horizontal-row' },
+    ],
+  },
+};
+
+// === GZCL Jacked & Tan 2.0 exercise maps ===
+const GZCL_PRIMARY_EXERCISES: Partial<Record<DayNumber, { name: string; category: ExerciseCategory }>> = {
+  1: { name: 'Competition Back Squat', category: 'squat-primary' },
+  2: { name: 'Competition Bench', category: 'bench-primary' },
+  3: { name: 'Competition Deadlift', category: 'deadlift-primary' },
+  4: { name: 'Overhead Press', category: 'shoulders-press' },
+};
+const GZCL_OHP_MULTIPLIER = 0.65;
+
+const GZCL_DAY_EXERCISE_DEFAULTS: Partial<Record<DayNumber, { secondaries: SlotDef[]; accessories: SlotDef[] }>> = {
+  1: { // T1 Squat — T2 front squat, T3 legs/abs
+    secondaries: [
+      { name: 'Front Squat', category: 'squat-secondary' },
+      { name: 'Barbell Row', category: 'horizontal-row' },
+    ],
+    accessories: [
+      { name: 'Leg Press', category: 'quad-accessory' },
+      { name: 'Nordic Curl', category: 'posterior-chain' },
+      { name: 'Ab Wheel', category: 'core' },
+    ],
+  },
+  2: { // T1 Bench — T2 incline, T3 push/pull
+    secondaries: [
+      { name: 'Incline Bench', category: 'bench-secondary' },
+      { name: 'Weighted Pull-up', category: 'vertical-pull' },
+    ],
+    accessories: [
+      { name: 'Tricep Pushdown (rope)', category: 'triceps' },
+      { name: 'Face Pull', category: 'shoulders-isolation' },
+      { name: 'Spider Curl', category: 'biceps' },
+    ],
+  },
+  3: { // T1 Deadlift — T2 RDL, T3 posterior
+    secondaries: [
+      { name: 'Deficit Deadlift (1")', category: 'deadlift-secondary' },
+      { name: 'Good Morning', category: 'posterior-chain' },
+    ],
+    accessories: [
+      { name: 'GHR', category: 'posterior-chain' },
+      { name: 'Leg Press', category: 'quad-accessory' },
+      { name: 'Ab Wheel', category: 'core' },
+    ],
+  },
+  4: { // T1 OHP — T2 DB press, T3 shoulders/arms
+    secondaries: [
+      { name: 'DB Shoulder Press', category: 'shoulders-press' },
+      { name: 'Barbell Row', category: 'horizontal-row' },
+    ],
+    accessories: [
+      { name: 'Lateral Raise', category: 'shoulders-isolation' },
+      { name: 'Overhead Tricep Ext (cable)', category: 'triceps' },
+      { name: 'Cable Curl', category: 'biceps' },
+    ],
+  },
+};
+
+// === RTS Generalized Intermediate exercise maps ===
+const RTS_PRIMARY_EXERCISES: Partial<Record<DayNumber, { name: string; category: ExerciseCategory }>> = {
+  1: { name: 'Competition Back Squat', category: 'squat-primary' },
+  2: { name: 'Competition Bench', category: 'bench-primary' },
+  3: { name: 'Competition Deadlift', category: 'deadlift-primary' },
+  4: { name: 'Competition Bench', category: 'bench-primary' },  // 2nd bench day
+};
+
+const RTS_DAY_EXERCISE_DEFAULTS: Partial<Record<DayNumber, { secondaries: SlotDef[]; accessories: SlotDef[] }>> = {
+  1: { // Squat — competition variations + posterior chain
+    secondaries: [
+      { name: 'Pause Squat', category: 'squat-secondary' },
+    ],
+    accessories: [
+      { name: 'GHR', category: 'posterior-chain' },
+      { name: 'Leg Press', category: 'quad-accessory' },
+      { name: 'Ab Wheel', category: 'core' },
+    ],
+  },
+  2: { // Bench — close grip variation + rows
+    secondaries: [
+      { name: 'Close Grip Bench', category: 'bench-secondary' },
+      { name: 'Barbell Row', category: 'horizontal-row' },
+    ],
+    accessories: [
+      { name: 'Tricep Pushdown (rope)', category: 'triceps' },
+      { name: 'Face Pull', category: 'shoulders-isolation' },
+    ],
+  },
+  3: { // Deadlift — deficit variation + posterior
+    secondaries: [
+      { name: 'Deficit Deadlift (1")', category: 'deadlift-secondary' },
+    ],
+    accessories: [
+      { name: 'Reverse Hyper', category: 'posterior-chain' },
+      { name: 'Nordic Curl', category: 'posterior-chain' },
+      { name: 'Ab Wheel', category: 'core' },
+    ],
+  },
+  4: { // Bench 2 — supplemental pressing + pulls
+    secondaries: [
+      { name: 'Incline Bench', category: 'bench-secondary' },
+      { name: 'Weighted Pull-up', category: 'vertical-pull' },
+    ],
+    accessories: [
+      { name: 'Lateral Raise', category: 'shoulders-isolation' },
+      { name: 'Spider Curl', category: 'biceps' },
+    ],
+  },
+};
+
 async function findExercise(name: string, category: ExerciseCategory) {
   const found = await db.exercises.where('name').equals(name).first();
   if (found) return { id: found.id, name: found.name };
@@ -272,6 +483,10 @@ export async function generateWorkoutSets(
     blockType === 'conj-4' ? CONJ_PRIMARY_EXERCISES[dayNumber] :
     blockType === 'linear-4' ? WENDLER_PRIMARY_EXERCISES[dayNumber] :
     blockType === 'texas-4' ? TEXAS_PRIMARY_EXERCISES[dayNumber] :
+    blockType === 'calgary-16' ? CALGARY_PRIMARY_EXERCISES[dayNumber] :
+    blockType === 'sheiko-4' ? SHEIKO_PRIMARY_EXERCISES[dayNumber] :
+    blockType === 'gzcl-4' ? GZCL_PRIMARY_EXERCISES[dayNumber] :
+    blockType === 'rts-4' ? RTS_PRIMARY_EXERCISES[dayNumber] :
     null
   ) ?? PRIMARY_EXERCISES[dayNumber];
   const primary = await findExercise(primaryDef.name, primaryDef.category);
@@ -279,6 +494,10 @@ export async function generateWorkoutSets(
     blockType === 'conj-4' ? CONJ_DAY_EXERCISE_DEFAULTS[dayNumber] :
     blockType === 'linear-4' ? WENDLER_DAY_EXERCISE_DEFAULTS[dayNumber] :
     blockType === 'texas-4' ? TEXAS_DAY_EXERCISE_DEFAULTS[dayNumber] :
+    blockType === 'calgary-16' ? CALGARY_DAY_EXERCISE_DEFAULTS[dayNumber] :
+    blockType === 'sheiko-4' ? SHEIKO_DAY_EXERCISE_DEFAULTS[dayNumber] :
+    blockType === 'gzcl-4' ? GZCL_DAY_EXERCISE_DEFAULTS[dayNumber] :
+    blockType === 'rts-4' ? RTS_DAY_EXERCISE_DEFAULTS[dayNumber] :
     null
   ) ?? DAY_EXERCISE_DEFAULTS[dayNumber];
 
@@ -362,7 +581,10 @@ export async function generateWorkoutSets(
       }
     }
   } else {
-    const topGoalWeight = roundTo5(calculateGoalWeight(trainingMax, template.topReps, template.topRPE) * fatigueMult);
+    // GZCL Day 4 (OHP) uses bench 1RM with reduced multiplier
+    let effectiveTM = trainingMax;
+    if (blockType === 'gzcl-4' && dayNumber === 4) effectiveTM = roundTo5(trainingMax * GZCL_OHP_MULTIPLIER);
+    const topGoalWeight = roundTo5(calculateGoalWeight(effectiveTM, template.topReps, template.topRPE) * fatigueMult);
     for (let i = 0; i < template.topSets; i++) {
       sets.push(makeSet({
         exerciseId: primary.id, exerciseName: primary.name, setType: 'top',
@@ -373,7 +595,7 @@ export async function generateWorkoutSets(
 
     // Backoff sets (skip entirely when template prescribes 0, e.g. conjugate ME days)
     if (template.backoffSets > 0) {
-      const backoffGoalWeight = roundTo5(calculateGoalWeight(trainingMax, template.backoffReps, template.backoffRPE) * fatigueMult);
+      const backoffGoalWeight = roundTo5(calculateGoalWeight(effectiveTM, template.backoffReps, template.backoffRPE) * fatigueMult);
 
       // Volume-adjusted backoff set count (clamped to at least 1)
       const adjustedBackoffSets = Math.max(1, template.backoffSets + volumeAdj);

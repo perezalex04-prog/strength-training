@@ -1,4 +1,4 @@
-export type BlockType = 'linear-6' | 'linear-8' | 'linear-4' | 'dup-6' | 'wave-6' | 'conj-4' | 'peak-8' | 'texas-4' | 'block-12';
+export type BlockType = 'linear-6' | 'linear-8' | 'linear-4' | 'dup-6' | 'wave-6' | 'conj-4' | 'peak-8' | 'texas-4' | 'block-12' | 'calgary-16' | 'sheiko-4' | 'gzcl-4' | 'rts-4';
 
 export type Phase = 'accumulation' | 'transmutation' | 'realization' | 'deload';
 
@@ -156,9 +156,13 @@ export const BLOCK_MAX_WEEKS: Record<BlockType, number> = {
   'peak-8': 8,
   'texas-4': 4,
   'block-12': 12,
+  'calgary-16': 16,
+  'sheiko-4': 4,
+  'gzcl-4': 4,
+  'rts-4': 4,
 };
 
-export const BLOCK_TYPES: BlockType[] = ['linear-8', 'linear-6', 'linear-4', 'dup-6', 'wave-6', 'conj-4', 'texas-4', 'block-12', 'peak-8'];
+export const BLOCK_TYPES: BlockType[] = ['linear-8', 'linear-6', 'linear-4', 'dup-6', 'wave-6', 'conj-4', 'texas-4', 'block-12', 'peak-8', 'calgary-16', 'sheiko-4', 'gzcl-4', 'rts-4'];
 
 export const BLOCK_LABELS: Record<BlockType, string> = {
   'linear-6': 'Linear 6-Week',
@@ -170,6 +174,10 @@ export const BLOCK_LABELS: Record<BlockType, string> = {
   'peak-8': 'Meet Peak 8-Week',
   'texas-4': 'Texas Method',
   'block-12': 'Block Periodization 12-Wk',
+  'calgary-16': 'Calgary Barbell 16-Wk',
+  'sheiko-4': 'Sheiko (4-Wk Meso)',
+  'gzcl-4': 'GZCL Jacked & Tan',
+  'rts-4': 'RTS Gen. Intermediate',
 };
 
 export const PHASE_LABELS: Record<Phase, string> = {
@@ -221,9 +229,41 @@ const TEXAS_DAY_CONFIG: DayConfig[] = [
   { dayNumber: 3, label: 'Day 3 — Intensity', shortLabel: 'Intensity', primaryLift: 'deadlift', isVolume: false },
 ];
 
+const CALGARY_DAY_CONFIG: DayConfig[] = [
+  { dayNumber: 1, label: 'Day 1 — Squat', shortLabel: 'D1 Squat', primaryLift: 'squat', isVolume: false },
+  { dayNumber: 2, label: 'Day 2 — Bench', shortLabel: 'D2 Bench', primaryLift: 'bench', isVolume: false },
+  { dayNumber: 3, label: 'Day 3 — Squat Vol', shortLabel: 'D3 SQ Vol', primaryLift: 'squat', isVolume: true },
+  { dayNumber: 4, label: 'Day 4 — Deadlift', shortLabel: 'D4 Dead', primaryLift: 'deadlift', isVolume: false },
+];
+
+const SHEIKO_DAY_CONFIG: DayConfig[] = [
+  { dayNumber: 1, label: 'Day 1 — Squat/Bench', shortLabel: 'D1 SQ/BN', primaryLift: 'squat', isVolume: false },
+  { dayNumber: 2, label: 'Day 2 — Bench/Dead', shortLabel: 'D2 BN/DL', primaryLift: 'bench', isVolume: false },
+  { dayNumber: 3, label: 'Day 3 — Squat/Bench', shortLabel: 'D3 SQ/BN', primaryLift: 'squat', isVolume: true },
+  { dayNumber: 4, label: 'Day 4 — Dead/Bench', shortLabel: 'D4 DL/BN', primaryLift: 'deadlift', isVolume: true },
+];
+
+const GZCL_DAY_CONFIG: DayConfig[] = [
+  { dayNumber: 1, label: 'Day 1 — T1 Squat', shortLabel: 'T1 Squat', primaryLift: 'squat', isVolume: false },
+  { dayNumber: 2, label: 'Day 2 — T1 Bench', shortLabel: 'T1 Bench', primaryLift: 'bench', isVolume: false },
+  { dayNumber: 3, label: 'Day 3 — T1 Deadlift', shortLabel: 'T1 Dead', primaryLift: 'deadlift', isVolume: false },
+  { dayNumber: 4, label: 'Day 4 — T1 OHP', shortLabel: 'T1 OHP', primaryLift: 'bench', isVolume: false },
+];
+
+const RTS_DAY_CONFIG: DayConfig[] = [
+  { dayNumber: 1, label: 'Day 1 — Squat', shortLabel: 'D1 Squat', primaryLift: 'squat', isVolume: false },
+  { dayNumber: 2, label: 'Day 2 — Bench', shortLabel: 'D2 Bench', primaryLift: 'bench', isVolume: false },
+  { dayNumber: 3, label: 'Day 3 — Deadlift', shortLabel: 'D3 Dead', primaryLift: 'deadlift', isVolume: false },
+  { dayNumber: 4, label: 'Day 4 — Bench 2', shortLabel: 'D4 Bench', primaryLift: 'bench', isVolume: false },
+];
+
 export function getDayConfigForBlock(blockType: BlockType): DayConfig[] {
   if (blockType === 'conj-4') return CONJ_DAY_CONFIG;
   if (blockType === 'linear-4') return WENDLER_DAY_CONFIG;
   if (blockType === 'texas-4') return TEXAS_DAY_CONFIG;
+  if (blockType === 'calgary-16') return CALGARY_DAY_CONFIG;
+  if (blockType === 'sheiko-4') return SHEIKO_DAY_CONFIG;
+  if (blockType === 'gzcl-4') return GZCL_DAY_CONFIG;
+  if (blockType === 'rts-4') return RTS_DAY_CONFIG;
   return DAY_CONFIG;
 }

@@ -43,7 +43,7 @@ export async function seedDatabase() {
     await db.templates.bulkAdd(templateData as any);
   } else {
     // Migrate: add new block types for existing users
-    const newBlockTypes = ['conj-4', 'peak-8', 'texas-4', 'block-12'];
+    const newBlockTypes = ['conj-4', 'peak-8', 'texas-4', 'block-12', 'calgary-16', 'sheiko-4', 'gzcl-4', 'rts-4'];
     for (const bt of newBlockTypes) {
       const count = await db.templates.where({ blockType: bt, weekNumber: 1 }).count();
       if (count === 0) {
