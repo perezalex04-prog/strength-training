@@ -33,7 +33,9 @@ export function SetRow({ set, onUpdate, showExerciseName = false }: SetRowProps)
   const { settings } = useSettings();
   const [editField, setEditField] = useState<'weight' | 'reps' | 'rpe' | null>(null);
 
-  const isComplete = set.actualWeight != null && set.actualReps != null && set.actualRPE != null;
+  // Percentage-based sets (goalRPE === 0) are complete with just weight + reps; RPE is optional
+  const isPercentageBased = set.goalRPE === 0;
+  const isComplete = set.actualWeight != null && set.actualReps != null && (isPercentageBased || set.actualRPE != null);
   const isPlaceholder = set.exerciseId === '' && set.setType === 'optional';
 
   // Don't render input buttons for unassigned optional slots
@@ -57,8 +59,8 @@ export function SetRow({ set, onUpdate, showExerciseName = false }: SetRowProps)
             <div className="text-xs text-slate-500 truncate mb-0.5">{set.exerciseName}</div>
           )}
           <div className="text-xs text-slate-500/80">
-            {set.goalWeight > 0 && <>{set.goalWeight} × {set.goalReps} @{set.goalRPE}</>}
-            {set.goalWeight === 0 && <>{set.goalReps} reps @{set.goalRPE}</>}
+            {set.goalWeight > 0 && <>{set.goalWeight} × {set.goalReps}{set.goalRPE > 0 ? ` @${set.goalRPE}` : ''}</>}
+            {set.goalWeight === 0 && <>{set.goalReps} reps{set.goalRPE > 0 ? ` @${set.goalRPE}` : ''}</>}
           </div>
         </div>
 
@@ -87,10 +89,12 @@ export function SetRow({ set, onUpdate, showExerciseName = false }: SetRowProps)
             onClick={() => setEditField('rpe')}
             className={clsx(
               'min-w-[36px] px-2 py-1.5 rounded text-center text-sm font-semibold',
-              set.actualRPE ? 'bg-yellow-500/20 text-yellow-300' : 'bg-slate-700 text-slate-500',
+              set.actualRPE ? 'bg-yellow-500/20 text-yellow-300'
+                : isPercentageBased ? 'bg-slate-800 text-slate-600 border border-dashed border-slate-700'
+                : 'bg-slate-700 text-slate-500',
             )}
           >
-            {set.actualRPE ?? '—'}
+            {set.actualRPE ?? (isPercentageBased ? '·' : '—')}
           </button>
         </div>
 

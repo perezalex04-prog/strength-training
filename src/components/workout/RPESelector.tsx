@@ -7,9 +7,13 @@ interface RPESelectorProps {
   currentValue?: number | null;
 }
 
-const RPE_VALUES = [5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10];
+const RPE_VALUES = [3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10];
 
 const RPE_DESCRIPTIONS: Record<number, string> = {
+  3: '7+ reps left',
+  3.5: '6-7 reps left',
+  4: '6 reps left',
+  4.5: '5-6 reps left',
   5: '5 reps left',
   5.5: '4-5 reps left',
   6: '4 reps left',

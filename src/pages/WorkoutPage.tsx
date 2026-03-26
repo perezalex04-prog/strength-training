@@ -125,16 +125,14 @@ export function WorkoutPage() {
   const groups = groupSets(sets);
 
   // For progress, only count sets that have an assigned exercise
+  // Percentage-based sets (goalRPE === 0) are complete with just weight + reps
   const assignedSets = sets.filter((s) => s.exerciseId !== '');
-  const completedSets = assignedSets.filter(
-    (s) => s.actualWeight != null && s.actualReps != null && s.actualRPE != null,
-  ).length;
+  const isSetComplete = (s: typeof sets[0]) =>
+    s.actualWeight != null && s.actualReps != null && (s.goalRPE === 0 || s.actualRPE != null);
+  const completedSets = assignedSets.filter(isSetComplete).length;
 
   // Show Complete button once at least one primary set is filled in
-  // (don't require every accessory to be filled)
-  const hasAnyCompletedSet = assignedSets.some(
-    (s) => s.actualWeight != null && s.actualReps != null && s.actualRPE != null,
-  );
+  const hasAnyCompletedSet = assignedSets.some(isSetComplete);
 
   return (
     <div>
