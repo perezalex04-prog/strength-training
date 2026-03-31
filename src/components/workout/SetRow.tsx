@@ -36,6 +36,7 @@ export function SetRow({ set, onUpdate, showExerciseName = false }: SetRowProps)
   // Percentage-based sets (goalRPE === 0) are complete with just weight + reps; RPE is optional
   const isPercentageBased = set.goalRPE === 0;
   const isComplete = set.actualWeight != null && set.actualReps != null && (isPercentageBased || set.actualRPE != null);
+  const isBW = set.actualWeight === 0;
   const isPlaceholder = set.exerciseId === '' && set.setType === 'optional';
 
   // Don't render input buttons for unassigned optional slots
@@ -69,10 +70,10 @@ export function SetRow({ set, onUpdate, showExerciseName = false }: SetRowProps)
             onClick={() => setEditField('weight')}
             className={clsx(
               'min-w-[52px] px-2 py-1.5 rounded text-center text-sm font-semibold',
-              set.actualWeight ? 'bg-yellow-500/20 text-yellow-300' : 'bg-slate-700 text-slate-500',
+              (set.actualWeight || isBW) ? 'bg-yellow-500/20 text-yellow-300' : 'bg-slate-700 text-slate-500',
             )}
           >
-            {set.actualWeight ?? '—'}
+            {set.actualWeight === 0 ? 'BW' : (set.actualWeight ?? '—')}
           </button>
           <span className="text-slate-600 text-xs">×</span>
           <button

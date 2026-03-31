@@ -16,30 +16,41 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
 
   useEffect(() => {
     if (isOpen) {
-      setValue(initialValue ? String(initialValue) : '');
+      if (mode === 'weight' && initialValue === 0) {
+        setValue('BW');
+      } else {
+        setValue(initialValue ? String(initialValue) : '');
+      }
     }
-  }, [isOpen, initialValue]);
+  }, [isOpen, initialValue, mode]);
 
   if (!isOpen) return null;
 
   const handleDigit = (d: string) => {
     setValue((prev) => {
+      // Clear BW mode when typing digits
+      const base = prev === 'BW' ? '' : prev;
       if (d === '.') {
-        if (prev.includes('.')) return prev;
-        return prev === '' ? '0.' : prev + '.';
+        if (base.includes('.')) return base;
+        return base === '' ? '0.' : base + '.';
       }
-      const next = prev + d;
-      if (mode === 'weight' && Number(next) > 1500) return prev;
-      if (mode === 'reps' && Number(next) > 99) return prev;
+      const next = base + d;
+      if (mode === 'weight' && Number(next) > 1500) return base;
+      if (mode === 'reps' && Number(next) > 99) return base;
       // Limit to 1 decimal place for weights
-      if (prev.includes('.') && prev.split('.')[1].length >= 1) return prev;
+      if (base.includes('.') && base.split('.')[1].length >= 1) return base;
       return next;
     });
   };
 
-  const handleDelete = () => setValue((prev) => prev.slice(0, -1));
+  const handleDelete = () => setValue((prev) => prev === 'BW' ? '' : prev.slice(0, -1));
 
   const handleConfirm = () => {
+    if (value === 'BW') {
+      onConfirm(0);
+      onClose();
+      return;
+    }
     const num = Number(value);
     if (num > 0) {
       if (mode === 'weight') {
@@ -71,18 +82,29 @@ export function NumberPad({ isOpen, onClose, onConfirm, initialValue, mode, labe
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
           <span className="text-sm text-slate-400">{label ?? (mode === 'weight' ? 'Weight (lbs)' : 'Reps')}</span>
           <span className="text-2xl font-bold text-slate-100 min-w-[80px] text-right tabular-nums">
-            {value || '0'}
-            {mode === 'weight' && <span className="text-sm text-slate-500 ml-1">lbs</span>}
+            {value === 'BW' ? 'BW' : (value || '0')}
+            {mode === 'weight' && value !== 'BW' && <span className="text-sm text-slate-500 ml-1">lbs</span>}
           </span>
         </div>
 
         {/* Quick increment buttons for weight */}
         {mode === 'weight' && (
           <div className="flex gap-2 px-4 pb-2">
+            <button
+              onClick={() => setValue('BW')}
+              className={clsx(
+                'px-3 py-2.5 rounded-lg text-sm font-semibold',
+                value === 'BW'
+                  ? 'bg-amber-600 text-white'
+                  : 'bg-slate-700 text-slate-300 active:bg-slate-600',
+              )}
+            >
+              BW
+            </button>
             {increments.map((delta) => (
               <button
                 key={delta}
-                onClick={() => handleIncrement(delta)}
+                onClick={() => { if (value === 'BW') setValue(''); handleIncrement(delta); }}
                 className={clsx(
                   'flex-1 py-2.5 rounded-lg text-sm font-semibold',
                   delta > 0
