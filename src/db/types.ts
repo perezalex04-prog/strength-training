@@ -1,4 +1,4 @@
-export type BlockType = 'linear-6' | 'linear-8' | 'linear-4' | 'dup-6' | 'wave-6' | 'conj-4' | 'peak-8' | 'texas-4' | 'block-12' | 'calgary-16' | 'sheiko-4' | 'gzcl-4' | 'rts-4';
+export type BlockType = 'linear-6' | 'linear-8' | 'linear-4' | 'dup-6' | 'wave-6' | 'conj-4' | 'peak-8' | 'texas-4' | 'block-12' | 'calgary-16' | 'sheiko-4' | 'gzcl-4' | 'rts-4' | 'bryant-6';
 
 export type Phase = 'accumulation' | 'transmutation' | 'realization' | 'deload' | 'comp prep' | 'peak' | 'taper' | 'meet week';
 
@@ -160,9 +160,10 @@ export const BLOCK_MAX_WEEKS: Record<BlockType, number> = {
   'sheiko-4': 4,
   'gzcl-4': 4,
   'rts-4': 4,
+  'bryant-6': 6,
 };
 
-export const BLOCK_TYPES: BlockType[] = ['linear-8', 'linear-6', 'linear-4', 'dup-6', 'wave-6', 'conj-4', 'texas-4', 'block-12', 'peak-8', 'calgary-16', 'sheiko-4', 'gzcl-4', 'rts-4'];
+export const BLOCK_TYPES: BlockType[] = ['linear-8', 'linear-6', 'linear-4', 'dup-6', 'wave-6', 'conj-4', 'texas-4', 'block-12', 'peak-8', 'calgary-16', 'sheiko-4', 'gzcl-4', 'rts-4', 'bryant-6'];
 
 export const BLOCK_LABELS: Record<BlockType, string> = {
   'linear-6': 'Linear 6-Week',
@@ -178,6 +179,7 @@ export const BLOCK_LABELS: Record<BlockType, string> = {
   'sheiko-4': 'Sheiko (4-Wk Meso)',
   'gzcl-4': 'GZCL Jacked & Tan',
   'rts-4': 'RTS Gen. Intermediate',
+  'bryant-6': 'Bryant Powerbuilding 1-10-1',
 };
 
 export const PHASE_LABELS: Record<Phase, string> = {
@@ -261,6 +263,16 @@ const RTS_DAY_CONFIG: DayConfig[] = [
   { dayNumber: 4, label: 'Day 4 — Bench 2', shortLabel: 'D4 Bench', primaryLift: 'bench', isVolume: false },
 ];
 
+/** Bryant Powerbuilding 1-10-1 — 4 days (3 required + 1 optional conditioning).
+ *  D1 Squat, D2 Bench, D3 Trap-Bar DL focus, D4 Conditioning (optional).
+ *  Main lifts use ramping singles; accessories use Chuck Sipes pyramid (1→10→1 = 19 sets, 100 reps). */
+const BRYANT_DAY_CONFIG: DayConfig[] = [
+  { dayNumber: 1, label: 'Day 1 — Squat (Lower)', shortLabel: 'D1 Squat', primaryLift: 'squat', isVolume: false },
+  { dayNumber: 2, label: 'Day 2 — Bench (Upper)', shortLabel: 'D2 Bench', primaryLift: 'bench', isVolume: false },
+  { dayNumber: 3, label: 'Day 3 — Trap-Bar DL', shortLabel: 'D3 TBar', primaryLift: 'deadlift', isVolume: false },
+  { dayNumber: 4, label: 'Day 4 — Conditioning', shortLabel: 'D4 Cond', primaryLift: 'deadlift', isVolume: true },
+];
+
 export function getDayConfigForBlock(blockType: BlockType): DayConfig[] {
   if (blockType === 'conj-4') return CONJ_DAY_CONFIG;
   if (blockType === 'linear-4') return WENDLER_DAY_CONFIG;
@@ -269,5 +281,6 @@ export function getDayConfigForBlock(blockType: BlockType): DayConfig[] {
   if (blockType === 'sheiko-4') return SHEIKO_DAY_CONFIG;
   if (blockType === 'gzcl-4') return GZCL_DAY_CONFIG;
   if (blockType === 'rts-4') return RTS_DAY_CONFIG;
+  if (blockType === 'bryant-6') return BRYANT_DAY_CONFIG;
   return DAY_CONFIG;
 }

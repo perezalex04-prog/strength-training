@@ -1518,5 +1518,40 @@
     "id": "ex-304",
     "name": "Dimel Deadlift",
     "category": "posterior-chain"
+  },
+  {
+    "id": "ex-305",
+    "name": "Snatch Grip Shrug",
+    "category": "posterior-chain"
+  },
+  {
+    "id": "ex-306",
+    "name": "Backward Sled Drag",
+    "category": "quad-accessory"
+  },
+  {
+    "id": "ex-307",
+    "name": "Neck Flex/Ext",
+    "category": "calves-misc"
+  },
+  {
+    "id": "ex-308",
+    "name": "T-Bar Prison Row",
+    "category": "horizontal-row"
+  },
+  {
+    "id": "ex-309",
+    "name": "DB Seal Row",
+    "category": "horizontal-row"
+  },
+  {
+    "id": "ex-310",
+    "name": "DB Floor Fly",
+    "category": "chest-accessory"
+  },
+  {
+    "id": "ex-311",
+    "name": "Army Hand-Release Push-up",
+    "category": "chest-accessory"
   }
 ]

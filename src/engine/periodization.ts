@@ -493,6 +493,224 @@ const RTS_DAY_EXERCISE_DEFAULTS: Partial<Record<DayNumber, { secondaries: SlotDe
   },
 };
 
+// ============================================================================
+// === BRYANT POWERBUILDING 1-10-1 (Josh Bryant) ===
+// ============================================================================
+// 6-week off-season powerbuilding block built around the Chuck Sipes pyramid.
+// - "1-10-1" is NOT 1 rep → 10 reps → 1 rep. It is a full ascending-descending
+//   pyramid: 1→2→3→4→5→6→7→8→9→10→9→8→7→6→5→4→3→2→1 (19 sets, 100 total reps,
+//   fixed weight, "breath ladder" rest = # breaths matching last set's reps).
+// - Sipes scaled versions exist for exercises that can't tolerate 100 reps:
+//   1-5-1 (9 sets, 25 reps), 1-8-1 (15 sets, 64 reps).
+// - Main lifts do NOT use the pyramid — squat and bench use "5, 1, 1, 1 @ MAX"
+//   (one warm-up set of 5 → three ramping singles to RPE 8-9 top).
+// - Trap-bar deadlift uses "6×1 @ 80% TM" — the one published percentage.
+// - Weeks 1-5 build, Week 6 is a reload (loads dropped ~30%).
+// - Source: https://joshstrength.com/2022/12/powerbuilding-1-10-1/
+//           https://marketplace.trainheroic.com/workout-plan/program/bryant-program-1671141210
+
+/** Rep sequence for pyramid of a given peak rep. 1-10-1 = [1,2...10,9...1]. */
+function pyramidReps(peak: number): number[] {
+  const up: number[] = [];
+  for (let i = 1; i <= peak; i++) up.push(i);
+  const down: number[] = [];
+  for (let i = peak - 1; i >= 1; i--) down.push(i);
+  return [...up, ...down];
+}
+
+/** Scale tag for a pyramid exercise — determines peak rep of the ladder. */
+type PyramidScale = '1-5-1' | '1-8-1' | '1-10-1';
+const PYRAMID_PEAK: Record<PyramidScale, number> = { '1-5-1': 5, '1-8-1': 8, '1-10-1': 10 };
+
+interface BryantAccessorySlot {
+  name: string;
+  category: ExerciseCategory;
+  /** If undefined, uses a straight-sets scheme (see `straight`). */
+  pyramid?: PyramidScale;
+  /** Straight sets scheme as [sets, reps] for non-pyramid exercises (pull-ups, neck). */
+  straight?: [number, number];
+}
+
+interface BryantDayDef {
+  /** Main lift for the day — uses ramping singles or 6x1@80%. */
+  main: {
+    name: string;
+    category: ExerciseCategory;
+    /** 'ramp' = 1x5 warmup + 3 ramping singles; 'fixed80' = 6x1 @ 80% TM. */
+    scheme: 'ramp' | 'fixed80';
+  } | null;
+  accessories: BryantAccessorySlot[];
+}
+
+/** Bryant 1-10-1 Week 1 day layout (from TrainHeroic published preview). */
+const BRYANT_DAY_DEFS: Partial<Record<DayNumber, BryantDayDef>> = {
+  // D1 Lower — Squat focus
+  1: {
+    main: { name: 'Competition Back Squat', category: 'squat-primary', scheme: 'ramp' },
+    accessories: [
+      { name: 'Leg Press', category: 'quad-accessory', pyramid: '1-10-1' },
+      { name: 'Leg Curl (lying)', category: 'posterior-chain', pyramid: '1-5-1' },
+      { name: 'Leg Extension', category: 'quad-accessory', pyramid: '1-10-1' },
+      { name: 'Neck Flex/Ext', category: 'calves-misc', straight: [2, 20] },
+    ],
+  },
+  // D2 Upper — Bench focus
+  2: {
+    main: { name: 'Competition Bench', category: 'bench-primary', scheme: 'ramp' },
+    accessories: [
+      { name: 'DB Seal Row', category: 'horizontal-row', pyramid: '1-10-1' },
+      { name: 'Push-up', category: 'chest-accessory', pyramid: '1-10-1' },
+      { name: 'Neutral Grip Pull-up', category: 'vertical-pull', straight: [8, 2] },
+      { name: 'DB Floor Fly', category: 'chest-accessory', pyramid: '1-10-1' },
+      { name: 'Tricep Pushdown (rope)', category: 'triceps', pyramid: '1-10-1' },
+    ],
+  },
+  // D3 Posterior — Trap Bar DL focus
+  3: {
+    main: { name: 'Trap Bar Deadlift', category: 'deadlift-primary', scheme: 'fixed80' },
+    accessories: [
+      { name: 'T-Bar Prison Row', category: 'horizontal-row', pyramid: '1-10-1' },
+      { name: 'Neutral Grip Pulldown', category: 'vertical-pull', pyramid: '1-10-1' },
+      { name: 'Snatch Grip Shrug', category: 'posterior-chain', pyramid: '1-10-1' },
+      { name: 'EZ Bar Curl', category: 'biceps', pyramid: '1-10-1' },
+    ],
+  },
+  // D4 Optional — Conditioning / GPP
+  4: {
+    main: null,
+    accessories: [
+      { name: 'Walking Lunge', category: 'quad-accessory', straight: [3, 20] },
+      { name: 'Backward Sled Drag', category: 'quad-accessory', straight: [4, 50] },
+      { name: 'Farmer Walk', category: 'core', straight: [2, 100] },
+      { name: 'EZ Bar Curl', category: 'biceps', straight: [1, 100] },
+      { name: 'Tricep Pushdown (rope)', category: 'triceps', straight: [1, 100] },
+      { name: 'Army Hand-Release Push-up', category: 'chest-accessory', straight: [1, 20] },
+    ],
+  },
+};
+
+interface BryantWeekConfig {
+  /** Target RPE for the final top single on ramp-scheme main lifts (squat/bench). */
+  topRPE: number;
+  /** % of deadlift TM for the 6x1 trap-bar deadlift on Day 3. */
+  trapBarPercent: number;
+  /** Load multiplier applied to last-used pyramid weight (1.0 = same, 0.7 = deload). */
+  pyramidLoadMult: number;
+  /** If true, this is the reload week — main lifts get dropped to RPE 7 + fewer singles. */
+  deload: boolean;
+}
+
+/** Week-over-week progression. Bryant: "Weeks 1-5 build, week 6 is a reload." */
+const BRYANT_CONFIG: Record<number, BryantWeekConfig> = {
+  1: { topRPE: 7.5, trapBarPercent: 0.78, pyramidLoadMult: 1.00, deload: false },
+  2: { topRPE: 8.0, trapBarPercent: 0.80, pyramidLoadMult: 1.00, deload: false },
+  3: { topRPE: 8.5, trapBarPercent: 0.82, pyramidLoadMult: 1.025, deload: false },
+  4: { topRPE: 8.5, trapBarPercent: 0.84, pyramidLoadMult: 1.05, deload: false },
+  5: { topRPE: 9.0, trapBarPercent: 0.85, pyramidLoadMult: 1.05, deload: false },
+  6: { topRPE: 7.0, trapBarPercent: 0.70, pyramidLoadMult: 0.70, deload: true },
+};
+
+async function generateBryantSets(
+  weekNumber: number,
+  dayNumber: DayNumber,
+): Promise<Omit<WorkoutSet, 'id' | 'sessionId'>[]> {
+  const cfg = BRYANT_CONFIG[weekNumber] ?? BRYANT_CONFIG[1];
+  const dayDef = BRYANT_DAY_DEFS[dayNumber];
+  if (!dayDef) return [];
+
+  const settings = await db.settings.get('singleton');
+  if (!settings) return [];
+
+  const sqTM = Math.round(settings.squat1RM * settings.trainingMaxPercent);
+  const bnTM = Math.round(settings.bench1RM * settings.trainingMaxPercent);
+  const dlTM = Math.round(settings.deadlift1RM * settings.trainingMaxPercent);
+
+  const sets: Omit<WorkoutSet, 'id' | 'sessionId'>[] = [];
+  let setNum = 0;
+
+  // === MAIN LIFT ===
+  if (dayDef.main) {
+    const mainEx = await findExercise(dayDef.main.name, dayDef.main.category);
+    const cat = dayDef.main.category;
+    const mainTM = cat.startsWith('squat') ? sqTM
+      : cat.startsWith('bench') ? bnTM
+      : dlTM;
+
+    if (dayDef.main.scheme === 'ramp') {
+      // "5, 1, 1, 1 @ MAX" — 1 warm-up set of 5 + 3 ramping singles to top RPE
+      // Warm-up @ ~60% TM, then singles ramping to target RPE
+      const warmupWeight = roundTo5(mainTM * 0.60);
+      sets.push(makeSet({
+        exerciseId: mainEx.id, exerciseName: mainEx.name, setType: 'top',
+        setNumber: ++setNum, goalWeight: warmupWeight,
+        goalReps: 5, goalRPE: 6.0, category: cat,
+      }));
+
+      // 3 ramping singles: build up to the target top single
+      // Single 1: ~2 RPE below target, Single 2: ~1 RPE below, Single 3: target
+      const numSingles = cfg.deload ? 2 : 3;
+      for (let i = 0; i < numSingles; i++) {
+        const rpeStep = numSingles > 1 ? (2.0 * (i / (numSingles - 1))) : 0;
+        const rpe = Math.max(6.0, cfg.topRPE - 2.0 + rpeStep);
+        const weight = roundTo5(calculateGoalWeight(mainTM, 1, rpe));
+        sets.push(makeSet({
+          exerciseId: mainEx.id, exerciseName: mainEx.name, setType: 'top',
+          setNumber: ++setNum, goalWeight: weight,
+          goalReps: 1, goalRPE: rpe, category: cat,
+        }));
+      }
+    } else {
+      // "6×1 @ 80% TM" — six singles at fixed percentage (trap-bar deadlift)
+      const weight = roundTo5(mainTM * cfg.trapBarPercent);
+      const numSingles = cfg.deload ? 4 : 6;
+      for (let i = 0; i < numSingles; i++) {
+        sets.push(makeSet({
+          exerciseId: mainEx.id, exerciseName: mainEx.name, setType: 'top',
+          setNumber: ++setNum, goalWeight: weight,
+          goalReps: 1, goalRPE: 0, category: cat,
+        }));
+      }
+    }
+  }
+
+  // === ACCESSORIES ===
+  // Pyramids: fixed weight across all sets, varying rep counts 1→peak→1.
+  // Starting weight = last used from PR history * week's load multiplier (1.0 by default).
+  // On deload week (6), pyramid collapses to 1-5-1 regardless of exercise's normal peak.
+  for (const acc of dayDef.accessories) {
+    const exercise = await findExercise(acc.name, acc.category);
+    const lastWeight = await getLastWeight(exercise.id);
+    const loadedWeight = roundTo5(lastWeight * cfg.pyramidLoadMult);
+
+    if (acc.pyramid) {
+      // Pyramid scheme
+      const peak = cfg.deload ? 5 : PYRAMID_PEAK[acc.pyramid];
+      const reps = pyramidReps(peak);
+      for (const r of reps) {
+        sets.push(makeSet({
+          exerciseId: exercise.id, exerciseName: exercise.name, setType: 'accessory',
+          setNumber: ++setNum, goalWeight: loadedWeight,
+          goalReps: r, goalRPE: 0, category: acc.category,
+        }));
+      }
+    } else if (acc.straight) {
+      // Straight sets scheme (pull-ups 8×2, neck 2×20, etc.)
+      const [numSets, repsPerSet] = acc.straight;
+      const setsCount = cfg.deload ? Math.max(1, Math.floor(numSets / 2)) : numSets;
+      for (let i = 0; i < setsCount; i++) {
+        sets.push(makeSet({
+          exerciseId: exercise.id, exerciseName: exercise.name,
+          setType: dayNumber === 4 ? 'optional' : 'accessory',
+          setNumber: ++setNum, goalWeight: loadedWeight,
+          goalReps: repsPerSet, goalRPE: 0, category: acc.category,
+        }));
+      }
+    }
+  }
+
+  return sets;
+}
+
 /**
  * Calgary Barbell 16-Week generator — percentage-based programming faithful to Bryce Krawczyk's template.
  * Each day has its own loading scheme: D1/D2 are competition intensity, D3 is variation, D4 is tempo/volume.
@@ -719,6 +937,12 @@ export async function generateWorkoutSets(
   // Calgary Barbell has its own fully custom generator (percentage-based, multi-lift days)
   if (blockType === 'calgary-16') {
     return generateCBBSets(weekNumber, dayNumber);
+  }
+
+  // Bryant Powerbuilding 1-10-1 uses a completely custom scheme — Sipes pyramid
+  // accessories + ramping singles on main lifts. Totally different from any template.
+  if (blockType === 'bryant-6') {
+    return generateBryantSets(weekNumber, dayNumber);
   }
 
   const template = await db.templates.where({ blockType, weekNumber }).first();
