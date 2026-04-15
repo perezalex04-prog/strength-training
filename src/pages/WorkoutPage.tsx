@@ -10,6 +10,7 @@ import { useActiveWorkout, type OneRMUpdate } from '@/hooks/useActiveWorkout';
 import { useRestTimer } from '@/hooks/useRestTimer';
 import { BLOCK_LABELS, BLOCK_TYPES, BLOCK_MAX_WEEKS, getDayConfigForBlock } from '@/db/types';
 import type { SetType, DayNumber, WorkoutSet, BlockType, ExerciseCategory } from '@/db/types';
+import { getLocalDate } from '@/utils/formatters';
 
 function usePersistedState<T>(key: string, defaultValue: T, parse: (v: string) => T, serialize: (v: T) => string = String as any, storage: Storage = sessionStorage): [T, (v: T) => void] {
   const [value, setValue] = useState<T>(() => {
@@ -79,9 +80,10 @@ export function WorkoutPage() {
   const { settings, updateSettings } = useSettings();
   const [selectedDate, setSelectedDate] = usePersistedState(
     'workoutDate',
-    new Date().toISOString().split('T')[0],
+    getLocalDate(),
     (v) => v,
     (v) => v,
+    localStorage,
   );
   const workout = useActiveWorkout(settings, selectedDate);
   const timer = useRestTimer(settings?.restTimerDefault ?? 180);
@@ -209,10 +211,10 @@ export function WorkoutPage() {
           }}
           className="absolute opacity-0 w-0 h-0"
         />
-        {selectedDate !== new Date().toISOString().split('T')[0] && (
+        {selectedDate !== getLocalDate() && (
           <button
             onClick={() => {
-              setSelectedDate(new Date().toISOString().split('T')[0]);
+              setSelectedDate(getLocalDate());
             }}
             className="text-xs text-slate-500 px-2 py-1"
           >

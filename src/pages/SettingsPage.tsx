@@ -3,6 +3,7 @@ import { Card } from '@/components/shared/Card';
 import { useSettings } from '@/hooks/useSettings';
 import type { PrimaryLift } from '@/db/types';
 import { exportAllData, importAllData } from '@/utils/export';
+import { getLocalDate } from '@/utils/formatters';
 import { useRef } from 'react';
 const LIFTS: { key: PrimaryLift; label: string; rmKey: string; goalKey: string }[] = [
   { key: 'squat', label: 'Squat', rmKey: 'squat1RM', goalKey: 'squatGoal' },
@@ -29,7 +30,7 @@ export function SettingsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `strength-tracker-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `strength-tracker-backup-${getLocalDate()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };

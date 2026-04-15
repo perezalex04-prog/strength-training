@@ -1,5 +1,6 @@
 import { db } from '@/db/database';
 import { calculateE1RM, calculateTonnage } from './e1rm';
+import { getLocalDate } from '@/utils/formatters';
 import type { WorkoutSet, PrimaryLift, ProgressionEntry, ExercisePR } from '@/db/types';
 
 /**
@@ -97,7 +98,7 @@ export async function createProgressionSnapshot(
   phase: string,
   liftBests: Record<PrimaryLift, WorkoutSet | null>,
 ): Promise<void> {
-  const date = new Date().toISOString().split('T')[0];
+  const date = getLocalDate();
   const id = `prog-${blockType}-w${weekNumber}`;
 
   const entry: ProgressionEntry = {

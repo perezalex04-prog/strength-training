@@ -6,6 +6,7 @@ import { calculateAutoregulatedBackoff, checkForNewPR, getLastWeight } from '@/e
 import { calculateGoalWeight, roundTo5 } from '@/engine/e1rm';
 import type { UserSettings, WorkoutSession, WorkoutSet, DayNumber, PrimaryLift, BlockType } from '@/db/types';
 import { getDayConfigForBlock } from '@/db/types';
+import { getLocalDate } from '@/utils/formatters';
 
 export interface OneRMUpdate {
   lift: string;
@@ -61,7 +62,7 @@ async function getPrevWeekBestE1RM(
 }
 
 export function useActiveWorkout(settings: UserSettings | undefined, selectedDate?: string) {
-  const today = selectedDate ?? new Date().toISOString().split('T')[0];
+  const today = selectedDate ?? getLocalDate();
 
   const blockCycle = settings?.blockCycle ?? 1;
 

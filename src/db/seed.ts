@@ -21,6 +21,34 @@ const DEFAULT_SETTINGS: UserSettings = {
   restTimerDefault: 180,
 };
 
+/**
+ * Safely delete stale sessions for a block type — but NEVER delete sessions
+ * where the user has entered actual data (weight/reps). Only wipes truly empty ones.
+ */
+async function deleteEmptyUncompletedSessions(blockType: string): Promise<void> {
+  const sessions = await db.sessions
+    .where('blockType').equals(blockType)
+    .filter((s) => !s.completed)
+    .toArray();
+
+  if (sessions.length === 0) return;
+
+  // Check each session: only delete if ALL sets have no actual data
+  const toDelete: string[] = [];
+  for (const sess of sessions) {
+    const sets = await db.sets.where('sessionId').equals(sess.id).toArray();
+    const hasActualData = sets.some((s) => s.actualWeight != null || s.actualReps != null);
+    if (!hasActualData) {
+      toDelete.push(sess.id);
+    }
+  }
+
+  if (toDelete.length > 0) {
+    await db.sets.where('sessionId').anyOf(toDelete).delete();
+    await db.sessions.bulkDelete(toDelete);
+  }
+}
+
 export async function seedDatabase() {
   const settingsCount = await db.settings.count();
   if (settingsCount === 0) {
@@ -36,6 +64,14 @@ export async function seedDatabase() {
   const exerciseCount = await db.exercises.count();
   if (exerciseCount === 0) {
     await db.exercises.bulkAdd(exerciseData as any);
+  } else {
+    // Incrementally add any new exercises that don't exist yet (by id).
+    // Safe for existing users — preserves their custom exercises and history.
+    const existingIds = new Set((await db.exercises.toCollection().primaryKeys()) as string[]);
+    const missing = (exerciseData as any[]).filter((e) => !existingIds.has(e.id));
+    if (missing.length > 0) {
+      await db.exercises.bulkAdd(missing);
+    }
   }
 
   const templateCount = await db.templates.count();
@@ -43,7 +79,7 @@ export async function seedDatabase() {
     await db.templates.bulkAdd(templateData as any);
   } else {
     // Migrate: add new block types for existing users
-    const newBlockTypes = ['conj-4', 'peak-8', 'texas-4', 'block-12', 'calgary-16', 'sheiko-4', 'gzcl-4', 'rts-4'];
+    const newBlockTypes = ['conj-4', 'peak-8', 'texas-4', 'block-12', 'calgary-16', 'sheiko-4', 'gzcl-4', 'rts-4', 'bryant-6'];
     for (const bt of newBlockTypes) {
       const count = await db.templates.where({ blockType: bt, weekNumber: 1 }).count();
       if (count === 0) {
@@ -102,62 +138,28 @@ export async function seedDatabase() {
       });
     }
 
-    // One-time: delete stale conj-4 sessions with RPE-based DE weights
-    // Uses a version flag so this only runs once per device
+    // One-time migrations: use version flags so they run once per device.
+    // All session deletions go through deleteEmptyUncompletedSessions() which
+    // NEVER deletes sessions where the user has entered actual weight/rep data.
     const conjWeek1 = await db.templates.where({ blockType: 'conj-4', weekNumber: 1 }).first();
     if (conjWeek1 && !(conjWeek1 as any)._wsV2) {
       await db.templates.update(conjWeek1.id, { _wsV2: true } as any);
-      const staleSessions = await db.sessions
-        .where('blockType').equals('conj-4')
-        .filter((s) => !s.completed)
-        .toArray();
-      if (staleSessions.length > 0) {
-        const staleIds = staleSessions.map((s) => s.id);
-        await db.sets.where('sessionId').anyOf(staleIds).delete();
-        await db.sessions.bulkDelete(staleIds);
-      }
+      await deleteEmptyUncompletedSessions('conj-4');
     }
 
-    // V3: Regenerate conj-4 sessions for authentic Westside exercise defaults + DE rep fixes
     if (conjWeek1 && !(conjWeek1 as any)._wsV3) {
       await db.templates.update(conjWeek1.id, { _wsV3: true } as any);
-      const staleSessions = await db.sessions
-        .where('blockType').equals('conj-4')
-        .filter((s) => !s.completed)
-        .toArray();
-      if (staleSessions.length > 0) {
-        const staleIds = staleSessions.map((s) => s.id);
-        await db.sets.where('sessionId').anyOf(staleIds).delete();
-        await db.sessions.bulkDelete(staleIds);
-      }
+      await deleteEmptyUncompletedSessions('conj-4');
     }
 
-    // V5: Remove backoff sets from conjugate (true Westside: ME hits max, DE does speed work, no backoffs)
     if (conjWeek1 && !(conjWeek1 as any)._wsV5) {
       await db.templates.update(conjWeek1.id, { _wsV5: true } as any);
-      const staleSessions = await db.sessions
-        .where('blockType').equals('conj-4')
-        .filter((s) => !s.completed)
-        .toArray();
-      if (staleSessions.length > 0) {
-        const staleIds = staleSessions.map((s) => s.id);
-        await db.sets.where('sessionId').anyOf(staleIds).delete();
-        await db.sessions.bulkDelete(staleIds);
-      }
+      await deleteEmptyUncompletedSessions('conj-4');
     }
 
-    // V6: Speed pulls as percentage-based singles on DE Lower + reduce secondary reps to 5-6 range
     if (conjWeek1 && !(conjWeek1 as any)._wsV6) {
       await db.templates.update(conjWeek1.id, { _wsV6: true } as any);
-      const staleSessions = await db.sessions
-        .where('blockType').equals('conj-4')
-        .filter((s) => !s.completed)
-        .toArray();
-      if (staleSessions.length > 0) {
-        const staleIds = staleSessions.map((s) => s.id);
-        await db.sets.where('sessionId').anyOf(staleIds).delete();
-        await db.sessions.bulkDelete(staleIds);
-      }
+      await deleteEmptyUncompletedSessions('conj-4');
     }
 
     // V7: Retroactively update secondary rep counts on ALL conj-4 sessions (including completed)
@@ -180,18 +182,9 @@ export async function seedDatabase() {
       }
     }
 
-    // V8: Add backoff sets for raw conjugate + Banded Squat on DE Lower
     if (conjWeek1 && !(conjWeek1 as any)._wsV8) {
       await db.templates.update(conjWeek1.id, { _wsV8: true } as any);
-      const staleSessions = await db.sessions
-        .where('blockType').equals('conj-4')
-        .filter((s) => !s.completed)
-        .toArray();
-      if (staleSessions.length > 0) {
-        const staleIds = staleSessions.map((s) => s.id);
-        await db.sets.where('sessionId').anyOf(staleIds).delete();
-        await db.sessions.bulkDelete(staleIds);
-      }
+      await deleteEmptyUncompletedSessions('conj-4');
     }
 
     // Migrate: always keep linear-4 (5/3/1) templates in sync with latest data
@@ -218,36 +211,20 @@ export async function seedDatabase() {
     const wendlerWeek1 = await db.templates.where({ blockType: 'linear-4', weekNumber: 1 }).first();
     if (wendlerWeek1 && !(wendlerWeek1 as any)._wsV4) {
       await db.templates.update(wendlerWeek1.id, { _wsV4: true } as any);
-      const staleSessions = await db.sessions
-        .where('blockType').equals('linear-4')
-        .filter((s) => !s.completed)
-        .toArray();
-      if (staleSessions.length > 0) {
-        const staleIds = staleSessions.map((s) => s.id);
-        await db.sets.where('sessionId').anyOf(staleIds).delete();
-        await db.sessions.bulkDelete(staleIds);
-      }
+      await deleteEmptyUncompletedSessions('linear-4');
     }
 
     // CBB V1: Rewrite Calgary Barbell sessions — now percentage-based with real day structure
     const cbbWeek1 = await db.templates.where({ blockType: 'calgary-16', weekNumber: 1 }).first();
     if (cbbWeek1 && !(cbbWeek1 as any)._cbbV1) {
-      await db.templates.update(cbbWeek1.id, { _cbbV1: true } as any);
       // Update all CBB templates with new data
       const cbbTemplates = (templateData as any[]).filter((t) => t.blockType === 'calgary-16');
       for (const tpl of cbbTemplates) {
         await db.templates.put(tpl);
       }
-      // Clear stale uncompleted CBB sessions so they regenerate
-      const staleSessions = await db.sessions
-        .where('blockType').equals('calgary-16')
-        .filter((s: any) => !s.completed)
-        .toArray();
-      if (staleSessions.length > 0) {
-        const staleIds = staleSessions.map((s: any) => s.id);
-        await db.sets.where('sessionId').anyOf(staleIds).delete();
-        await db.sessions.bulkDelete(staleIds);
-      }
+      // Set flag AFTER puts — put() replaces the entire record, so setting before would lose it
+      await db.templates.update(cbbWeek1.id, { _cbbV1: true } as any);
+      await deleteEmptyUncompletedSessions('calgary-16');
     }
   }
 }
