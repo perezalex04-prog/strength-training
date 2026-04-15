@@ -565,9 +565,9 @@ const BRYANT_DAY_DEFS: Partial<Record<DayNumber, BryantDayDef>> = {
       { name: 'Tricep Pushdown (rope)', category: 'triceps', pyramid: '1-10-1' },
     ],
   },
-  // D3 Posterior — Trap Bar DL focus
+  // D3 Posterior — Conventional Deadlift focus
   3: {
-    main: { name: 'Trap Bar Deadlift', category: 'deadlift-primary', scheme: 'fixed80' },
+    main: { name: 'Conventional Deadlift', category: 'deadlift-primary', scheme: 'ramp' },
     accessories: [
       { name: 'T-Bar Prison Row', category: 'horizontal-row', pyramid: '1-10-1' },
       { name: 'Neutral Grip Pulldown', category: 'vertical-pull', pyramid: '1-10-1' },

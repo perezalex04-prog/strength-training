@@ -264,12 +264,12 @@ const RTS_DAY_CONFIG: DayConfig[] = [
 ];
 
 /** Bryant Powerbuilding 1-10-1 — 4 days (3 required + 1 optional conditioning).
- *  D1 Squat, D2 Bench, D3 Trap-Bar DL focus, D4 Conditioning (optional).
+ *  D1 Squat, D2 Bench, D3 Conventional Deadlift, D4 Conditioning (optional).
  *  Main lifts use ramping singles; accessories use Chuck Sipes pyramid (1→10→1 = 19 sets, 100 reps). */
 const BRYANT_DAY_CONFIG: DayConfig[] = [
   { dayNumber: 1, label: 'Day 1 — Squat (Lower)', shortLabel: 'D1 Squat', primaryLift: 'squat', isVolume: false },
   { dayNumber: 2, label: 'Day 2 — Bench (Upper)', shortLabel: 'D2 Bench', primaryLift: 'bench', isVolume: false },
-  { dayNumber: 3, label: 'Day 3 — Trap-Bar DL', shortLabel: 'D3 TBar', primaryLift: 'deadlift', isVolume: false },
+  { dayNumber: 3, label: 'Day 3 — Deadlift', shortLabel: 'D3 Dead', primaryLift: 'deadlift', isVolume: false },
   { dayNumber: 4, label: 'Day 4 — Conditioning', shortLabel: 'D4 Cond', primaryLift: 'deadlift', isVolume: true },
 ];
 
